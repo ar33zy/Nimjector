@@ -1,0 +1,1 @@
+- {name: vanilla, techniques: ["VirtualAlloc", "RtlMoveMemory"]}
