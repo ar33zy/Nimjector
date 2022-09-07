@@ -1,1 +1,0 @@
-grep shellcode * -r | cut -d: -f2 | grep -Evi "let|proc|copymem|cast|unsafe|rptr" | wc -l

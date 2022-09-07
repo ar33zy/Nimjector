@@ -13,6 +13,18 @@ type Arguments = object
   name: string
   calls: seq[ApiCall]
 
+type InitSetup = object
+  name: string
+  setup: string
+
+proc init_setup(file_name: string): seq[InitSetup] =
+  var initSetup: seq[InitSetup]
+  var s = newFileStream(file_name)
+  load(s, initSetup)
+  s.close()
+
+  return initSetup
+
 proc get_techniques(file_name: string): seq[Technique] =
   var techniqueList: seq[Technique]
   var s = newFileStream(file_name)
@@ -51,6 +63,16 @@ proc indent_lines(lines: string, indent: int): string =
   
   return join(indented, "\n")
 
+proc get_init_setup(technique: string): string = 
+  let setup_list = init_setup("models/init_setup.yml")
+  var setup_contents: string = ""
+
+  for i in setup_list:
+    if i.name == technique:
+      setup_contents = readFile(fmt"inits/{i.setup}.nim")
+
+  return setup_contents
+ 
 proc build_template(technique: string, technique_list: seq): string = 
   let argument_list = custom_arguments("models/custom_arguments.yml")
   
@@ -65,13 +87,14 @@ proc build_template(technique: string, technique_list: seq): string =
     content = ""
     for custom_arg in arguments:
       if custom_arg.api_call == call:
-        content = custom_arg.fn_template
+        content = readFile(fmt"custom/{custom_arg.fn_template}.nim")
         if not checker.contains(content):
           checker.add(content)
           break
 
     if content == "":      
       content = readFile(fmt"functions/{call}.nim")
+      checker.add(content)
     api_template.add(content)
 
   var compiled_api = join(api_template, "")

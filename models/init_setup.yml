@@ -1,0 +1,6 @@
+- name: suspended_thread
+  setup: get_process_by_name
+- name: create_remote_thread 
+  setup: get_process_by_name
+- name: process_hollowing
+  setup: zwquery_information_process

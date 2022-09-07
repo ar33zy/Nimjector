@@ -1,10 +1,31 @@
 - name: create_timer_queue_timer
   calls:
   - api_call: CreateEvent
-    fn_template: "let event = CreateEvent(NULL, TRUE, FALSE, NULL)\n"
+    fn_template: create_timer_queue_timer_create_event
 - name: fiber_context_edit
   calls:
   - api_call: CreateFiber
-    fn_template: "let fiber = CreateFiber(0x100, cast[LPFIBER_START_ROUTINE](rPtr), NULL)\n"
+    fn_template: fiber_context_edit_create_fiber
   - api_call: RtlMoveMemory
-    fn_template: "let target = cast[pointer](cast[int64](fiber) + 0xB0)\nlet source = cast[pointer](rPtr)\nRtlMoveMemory(target, unsafeAddr source, cast[SIZE_T](8))\n"
+    fn_template: fiber_context_edit_rtl_move_memory
+- name: create_remote_thread
+  calls:
+  - api_call: VirtualAllocEx
+    fn_template: create_remote_thread_virtual_alloc_ex
+- name: suspended_thread
+  calls:
+  - api_call: VirtualProtect
+    fn_template: suspended_thread_virtual_protect
+  - api_call: VirtualProtect
+    fn_template: suspended_thread_virtual_protect_2
+  - api_call: CreateRemoteThread
+    fn_template: suspended_thread_create_remote_thread
+- name: process_hollowing
+  calls:
+  - api_call: WriteProcessMemory
+    fn_template: process_hollowing_write_process_memory
+  - api_call: ReadProcessMemory
+    fn_template: process_hollowing_read_process_memory
+  - api_call: ReadProcessMemory
+    fn_template: process_hollowing_read_process_memory_2
+
