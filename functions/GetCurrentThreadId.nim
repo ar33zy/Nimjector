@@ -1,0 +1,1 @@
+let threadId = GetCurrentThreadId()

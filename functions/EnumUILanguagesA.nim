@@ -1,0 +1,1 @@
+EnumUILanguagesA(cast[UILANGUAGE_ENUMPROCA](rPtr), MUI_LANGUAGE_ID, 0)

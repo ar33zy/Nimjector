@@ -1,0 +1,1 @@
+EnumSystemCodePagesW(cast[CODEPAGE_ENUMPROCW](rPtr), CP_INSTALLED)

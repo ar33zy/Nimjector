@@ -1,5 +1,5 @@
 Tool:
-nim c -d=release --cc:gcc --embedsrc=on --hints=on --app=console --cpu=amd64 --out=nimjector demo.nim
+nim c --skipProjCfg -d=release --cc:gcc --embedsrc=on --hints=on --app=console --cpu=amd64 --out=nimjector nimjector.nim
 
 Binary:
-nim c out.nim
+nim c test.nim

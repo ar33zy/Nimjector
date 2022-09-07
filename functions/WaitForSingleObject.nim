@@ -1,1 +1,1 @@
-WaitForSingleObject(hThread, 0xFFFF);
+WaitForSingleObject(targetHandle, 0xFFFF)

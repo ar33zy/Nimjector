@@ -1,0 +1,1 @@
+CryptEnumOIDInfo(cast[DWORD](NULL), cast[DWORD](NULL), cast[PFN_CRYPT_ENUM_OID_INFO](NULL), cast[PFN_CRYPT_ENUM_OID_INFO](rPtr))

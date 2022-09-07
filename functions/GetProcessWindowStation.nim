@@ -1,0 +1,1 @@
+let procWindowStation = GetProcessWindowStation()

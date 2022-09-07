@@ -1,0 +1,2 @@
+var dummy: DIGEST_HANDLE
+ImageGetDigestStream(targetHandle, CERT_PE_IMAGE_DIGEST_ALL_IMPORT_INFO, cast[DIGEST_FUNCTION](rPtr), cast[DIGEST_HANDLE](NULL))

@@ -1,0 +1,1 @@
+let threadDesktop = GetThreadDesktop(threadId)

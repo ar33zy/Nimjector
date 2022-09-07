@@ -1,24 +1,24 @@
 - name: vanilla
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - CreateThread
     - WaitForSingleObject
 - name: create_remote_thread
-  techniques:
+  api_calls:
     - VirtualAllocEx
     - WriteProcessMemory
     - CreateRemoteThread
     - CloseHandle
 - name: process_hollowing
-  techniques:
+  api_calls:
     - CreateProcess
     - ZwQueryInformationProcess
     - ReadProcessMemory
     - WriteProcessMemory
     - ResumeThread
 - name: apc_queue
-  techniques:
+  api_calls:
     - CreateToolhelp32Snapshot
     - Process32First
     - Process32Next
@@ -32,23 +32,24 @@
     - QueueUserAPC
     - CloseHandle
 - name: cert_enum_system_store_location
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - CertEnumSystemStoreLocation
 - name: cert_enum_system_store
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - CertEnumSystemStore
 - name: create_fiber
-  techniques:
+  api_calls:
+    - ConvertThreadToFiber
     - VirtualAlloc
     - RtlCopyMemory
     - CreateFiber
     - SwitchToFiber
 - name: create_threadpool_wait
-  techniques:
+  api_calls:
     - CreateEvent
     - VirtualAlloc
     - RtlCopyMemory
@@ -56,176 +57,176 @@
     - SetThreadpoolWait
     - WaitForSingleObject
 - name: create_timer_queue_timer
-  techniques:
+  api_calls:
     - VirtualAlloc
     - CreateTimerQueue
     - CreateEvent
     - CreateTimerQueueTimer
     - WaitForSingleObject
 - name: crypt_enum_oid_info
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - CryptEnumOIDInfo
 - name: early_bird_apc_queue
-  techniques:
+  api_calls:
     - CreateProcess
     - VirtualAllocEx
-    - WriteProcessmemory
+    - WriteProcessMemory
     - VirtualProtectEx
     - QueueUserAPC 
     - ResumeThread
 - name: enum_calendar_info_w
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - EnumCalendarInfoW
 - name: enum_child_windows
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - EnumChildWindows
 - name: enum_date_formats_a
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - EnumDateFormatsA
 - name: enum_desktops_w
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - GetProcessWindowStation
     - EnumDesktopsW
 - name: enum_desktop_windows
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - GetThreadDesktop
     - GetCurrentThreadId
     - EnumDesktopWindows
 - name: enum_display_monitors
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - EnumDisplayMonitors 
 - name: enumerate_loaded_modules
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - EnumerateLoadedModules
     - GetCurrentProcess
 - name: enum_font_families_ex_w
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - GetDC
     - EnumFontFamiliesExW
 - name: enum_fonts_w
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - GetDC
     - EnumFontsW
 - name: enum_language_group_locales
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - EnumLanguageGroupLocalesW
 - name: enum_objects
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - GetDC
     - EnumObjects
 - name: enum_pages_files_w
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - EnumPageFilesW
 - name: enum_pwr_schemes
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - EnumPwrSchemes
 - name: enum_resources_types_ex_w
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - LoadLibraryW
     - EnumResourceTypesExW
 - name: enum_resources_types_w
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - LoadLibraryW
     - EnumResourceTypesW
 - name: enum_system_codepages_a
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - EnumSystemCodePagesA
 - name: enum_system_codepages_w
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - EnumSystemCodePagesW
 - name: enum_system_geo_id
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - EnumSystemGeoID
 - name: enum_system_language_groups_a
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - EnumSystemLanguageGroupsA
 - name: enum_system_locales_ex
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - EnumSystemLocalesEx
 - name: enum_system_locales_a
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - EnumSystemLocalesA
 - name: enum_thread_windows
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - EnumThreadWindows
 - name: enum_time_formats_a
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - EnumTimeFormatsA
 - name: enum_time_formats_ex
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - EnumTimeFormatsEx
 - name: enum_ui_languages_a
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - EnumUILanguagesA
 - name: enum_ui_languages_w
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - EnumUILanguagesW
 - name: enum_windows
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - EnumWindows
 - name: enum_window_stations_w
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - EnumWindowStationsW
 - name: fiber_context_edit
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - ConvertThreadToFiber
@@ -233,31 +234,31 @@
     - RtlMoveMemory
     - SwitchToFiber
 - name: image_get_digest_stream
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - CreateFileW
     - ImageGetDigestStream
     - CloseHandle
 - name: imm_enum_input_context
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - ImmEnumInputContext
 - name: init_once_execute_once
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - InitOnceExecuteOnce
 - name: set_timer
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - SetTimer
     - GetMessageW
     - DispatchMessageW
 - name: setup_commit_file_queue_w
-  techniques:
+  api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - SetupOpenFileQueue
@@ -265,7 +266,7 @@
     - GetTopWindow
     - SetupCommitFileQueueW
 - name: suspended_thread
-  techniques:
+  api_calls:
     - CreateProcess 
     - OpenProcess
     - CloseHandle

