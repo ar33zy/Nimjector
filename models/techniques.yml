@@ -22,6 +22,7 @@
 - name: apc_queue
   api_calls:
     - CreateToolhelp32Snapshot
+    - CloseHandle
     - Process32First
     - Process32Next
     - OpenProcess
@@ -32,7 +33,6 @@
     - Thread32Next
     - OpenThread 
     - QueueUserAPC
-    - CloseHandle
 - name: cert_enum_system_store_location
   api_calls:
     - VirtualAlloc

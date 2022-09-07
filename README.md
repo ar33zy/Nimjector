@@ -3,6 +3,10 @@
 ## Installation
 nimble install yaml
 
+### Compile
+
+nim c --skipProjCfg -d=release --cc:gcc --embedsrc=on --hints=on --app=console --cpu=amd64 --out=nimjector nimjector.nim
+
 ## Credits
 
 ### Blog Posts

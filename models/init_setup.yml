@@ -4,3 +4,5 @@
   setup: get_process_by_name
 - name: process_hollowing
   setup: zwquery_information_process
+- name: apc_queue
+  setup: to_chars

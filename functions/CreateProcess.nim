@@ -8,3 +8,4 @@ var
 CreateProcess(NULL, newWideCString(processName), ps, ts, TRUE, CREATE_SUSPENDED, NULL, NULL, addr si.StartupInfo, addr pi)
 
 var targetHandle = pi.hThread
+

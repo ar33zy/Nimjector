@@ -28,4 +28,25 @@
     fn_template: process_hollowing_read_process_memory
   - api_call: ReadProcessMemory
     fn_template: process_hollowing_read_process_memory_2
-
+- name: early_bird_apc_queue
+  calls:
+  - api_call: VirtualAllocEx
+    fn_template: early_bird_apc_queue_virtual_alloc_ex
+- name: apc_queue
+  calls:
+  - api_call: CreateToolhelp32Snapshot
+    fn_template: apc_queue_create_toolhelp32_snapshot
+  - api_call: Process32First
+    fn_template: apc_queue_process32_first
+  - api_call: Process32Next
+    fn_template: apc_queue_process32_next
+  - api_call: OpenProcess
+    fn_template: apc_queue_open_process
+  - api_call: Thread32First
+    fn_template: apc_queue_thread32_first
+  - api_call: Thread32Next
+    fn_template: apc_queue_thread32_next
+  - api_call: OpenThread
+    fn_template: apc_queue_open_thread
+  - api_call: QueueUserAPC
+    fn_template: apc_queue_queue_user_apc

