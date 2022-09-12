@@ -18,7 +18,7 @@ Options:
   -t --technique technique_name Name of technique
   -P --print  			Print the template instead of writing into a file
   -p --process 			Target process to be spawned or injected
-  -e --encrypt 			Encrypts the binary
+  -e --encrypt 			Encrypts the shellcode 
 """
 
 var template_output: string = "payload.nim"

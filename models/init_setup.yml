@@ -1,8 +1,8 @@
 - name: suspended_thread
-  setup: get_process_by_name
+  setup: GetProcessByName
 - name: create_remote_thread 
-  setup: get_process_by_name
+  setup: GetProcessByName
 - name: process_hollowing
-  setup: zwquery_information_process
+  setup: ZwQueryInformationProcess
 - name: apc_queue
-  setup: to_chars
+  setup: toString

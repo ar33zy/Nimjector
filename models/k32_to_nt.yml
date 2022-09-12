@@ -1,0 +1,12 @@
+- name: VirtualAlloc
+  ntdll: NtAllocateVirtualMemory
+- name: VirtualAllocEx
+  ntdll: NtAllocateVirtualMemory
+- name: RtlCopyMemory
+  ntdll: NtWriteVirtualMemory
+- name: CreateThread
+  ntdll: NtCreateThreadEx
+- name: CreateRemoteThread
+  ntdll: NtCreateThreadEx
+- name: WaitForSingleObject
+  ntdll: NtWaitForSingleObject

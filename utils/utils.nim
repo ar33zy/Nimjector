@@ -46,7 +46,7 @@ proc get_calls(technique_list: seq[Technique], technique: string): seq[string] =
     if i.name == technique:
       return i.api_calls
 
-proc get_argument(argument_list: seq[Arguments], technique: string): seq[ApiCall] = 
+proc get_arguments(argument_list: seq[Arguments], technique: string): seq[ApiCall] = 
   for i in argument_list:
     if i.name == technique:
       return i.calls
@@ -77,7 +77,7 @@ proc build_template(technique: string, technique_list: seq): string =
   let argument_list = custom_arguments("models/custom_arguments.yml")
   
   let calls = get_calls(technique_list, technique)
-  let arguments = get_argument(argument_list, technique)
+  let arguments = get_arguments(argument_list, technique)
   var payload_template = readFile("templates/base_exe.nim")
   var api_template = newSeq[string]()
   var checker = newSeq[string]()

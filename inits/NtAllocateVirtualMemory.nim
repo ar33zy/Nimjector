@@ -1,0 +1,1 @@
+proc NtAllocateVirtualMemory(processHandle: HANDLE, baseAddress: PVOID, zeroBits: ULONG_PTR, regionSize: PSIZE_T, allocationType: ULONG, Protect: ULONG): NTSTATUS {.stdcall, dynlib: "ntdll", importc, discardable.}
