@@ -20,6 +20,7 @@ type
     SystemArgument2*: PVOID
   PKNORMAL_ROUTINE* = ptr KNORMAL_ROUTINE
 
+
 {.emit: """
 #pragma once
 
@@ -31,7 +32,7 @@ type
 
 #include <windows.h>
 
-#define SW2_SEED 0xC37D1755
+#define SW2_SEED 0xE91A5789
 #define SW2_ROL8(v) (v << 8 | v >> 24)
 #define SW2_ROR8(v) (v >> 8 | v << 24)
 #define SW2_ROX8(v) ((SW2_SEED % 2) ? SW2_ROL8(v) : SW2_ROR8(v))
@@ -204,26 +205,6 @@ EXTERN_C DWORD SW2_GetSyscallNumber(DWORD FunctionHash)
 
 
 
-proc NtWriteVirtualMemory*(ProcessHandle: HANDLE, BaseAddress: PVOID, Buffer: PVOID, NumberOfBytesToWrite: SIZE_T, NumberOfBytesWritten: PSIZE_T): NTSTATUS {.asmNoStackFrame.} =
-    asm """
-	mov [rsp +8], rcx          
-	mov [rsp+16], rdx
-	mov [rsp+24], r8
-	mov [rsp+32], r9
-	sub rsp, 0x28
-	mov ecx, 0x08B19978D
-	call SW2_GetSyscallNumber  
-	add rsp, 0x28
-	mov rcx, [rsp +8]          
-	mov rdx, [rsp+16]
-	mov r8, [rsp+24]
-	mov r9, [rsp+32]
-	mov r10, rcx
-	nop
-	syscall                    
-	ret
-    """
-
 proc NtAllocateVirtualMemory*(ProcessHandle: HANDLE, BaseAddress: PVOID, ZeroBits: ULONG, RegionSize: PSIZE_T, AllocationType: ULONG, Protect: ULONG): NTSTATUS {.asmNoStackFrame.} =
     asm """
 	mov [rsp +8], rcx          
@@ -231,7 +212,7 @@ proc NtAllocateVirtualMemory*(ProcessHandle: HANDLE, BaseAddress: PVOID, ZeroBit
 	mov [rsp+24], r8
 	mov [rsp+32], r9
 	sub rsp, 0x28
-	mov ecx, 0x019991F17
+	mov ecx, 0x0051F4BE1
 	call SW2_GetSyscallNumber  
 	add rsp, 0x28
 	mov rcx, [rsp +8]          
@@ -239,19 +220,18 @@ proc NtAllocateVirtualMemory*(ProcessHandle: HANDLE, BaseAddress: PVOID, ZeroBit
 	mov r8, [rsp+24]
 	mov r9, [rsp+32]
 	mov r10, rcx
-	nop
 	syscall                    
 	ret
     """
 
-proc NtProtectVirtualMemory*(ProcessHandle: HANDLE, BaseAddress: PVOID, RegionSize: PSIZE_T, NewProtect: ULONG, OldProtect: PULONG): NTSTATUS {.asmNoStackFrame.} =
+proc NtWriteVirtualMemory*(ProcessHandle: HANDLE, BaseAddress: PVOID, Buffer: PVOID, NumberOfBytesToWrite: SIZE_T, NumberOfBytesWritten: PSIZE_T): NTSTATUS {.asmNoStackFrame.} =
     asm """
 	mov [rsp +8], rcx          
 	mov [rsp+16], rdx
 	mov [rsp+24], r8
 	mov [rsp+32], r9
 	sub rsp, 0x28
-	mov ecx, 0x003950907
+	mov ecx, 0x09810A89E
 	call SW2_GetSyscallNumber  
 	add rsp, 0x28
 	mov rcx, [rsp +8]          
@@ -259,87 +239,6 @@ proc NtProtectVirtualMemory*(ProcessHandle: HANDLE, BaseAddress: PVOID, RegionSi
 	mov r8, [rsp+24]
 	mov r9, [rsp+32]
 	mov r10, rcx
-	nop
-	syscall                    
-	ret
-    """
-
-proc NtOpenProcess*(ProcessHandle: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: POBJECT_ATTRIBUTES, ClientId: PCLIENT_ID): NTSTATUS {.asmNoStackFrame.} =
-    asm """
-	mov [rsp +8], rcx          
-	mov [rsp+16], rdx
-	mov [rsp+24], r8
-	mov [rsp+32], r9
-	sub rsp, 0x28
-	mov ecx, 0x0EDAFCA3F
-	call SW2_GetSyscallNumber  
-	add rsp, 0x28
-	mov rcx, [rsp +8]          
-	mov rdx, [rsp+16]
-	mov r8, [rsp+24]
-	mov r9, [rsp+32]
-	mov r10, rcx
-	nop
-	syscall                    
-	ret
-    """
-
-proc NtQueueApcThread*(ThreadHandle: HANDLE, ApcRoutine: PKNORMAL_ROUTINE, ApcArgument1: PVOID, ApcArgument2: PVOID, ApcArgument3: PVOID): NTSTATUS {.asmNoStackFrame.} =
-    asm """
-	mov [rsp +8], rcx          
-	mov [rsp+16], rdx
-	mov [rsp+24], r8
-	mov [rsp+32], r9
-	sub rsp, 0x28
-	mov ecx, 0x0E24CEAEF
-	call SW2_GetSyscallNumber  
-	add rsp, 0x28
-	mov rcx, [rsp +8]          
-	mov rdx, [rsp+16]
-	mov r8, [rsp+24]
-	mov r9, [rsp+32]
-	mov r10, rcx
-	nop
-	syscall                    
-	ret
-    """
-
-proc NtAlertResumeThread*(ThreadHandle: HANDLE, PreviousSuspendCount: PULONG): NTSTATUS {.asmNoStackFrame.} =
-    asm """
-	mov [rsp +8], rcx          
-	mov [rsp+16], rdx
-	mov [rsp+24], r8
-	mov [rsp+32], r9
-	sub rsp, 0x28
-	mov ecx, 0x0667614E0
-	call SW2_GetSyscallNumber  
-	add rsp, 0x28
-	mov rcx, [rsp +8]          
-	mov rdx, [rsp+16]
-	mov r8, [rsp+24]
-	mov r9, [rsp+32]
-	mov r10, rcx
-	nop
-	syscall                    
-	ret
-    """
-
-proc NtClose*(Handle: HANDLE): NTSTATUS {.asmNoStackFrame.} =
-    asm """
-	mov [rsp +8], rcx          
-	mov [rsp+16], rdx
-	mov [rsp+24], r8
-	mov [rsp+32], r9
-	sub rsp, 0x28
-	mov ecx, 0x0088A6285
-	call SW2_GetSyscallNumber  
-	add rsp, 0x28
-	mov rcx, [rsp +8]          
-	mov rdx, [rsp+16]
-	mov r8, [rsp+24]
-	mov r9, [rsp+32]
-	mov r10, rcx
-	nop
 	syscall                    
 	ret
     """
@@ -351,7 +250,7 @@ proc NtCreateThreadEx*(ThreadHandle: PHANDLE, DesiredAccess: ACCESS_MASK, Object
 	mov [rsp+24], r8
 	mov [rsp+32], r9
 	sub rsp, 0x28
-	mov ecx, 0x0C85E88A6
+	mov ecx, 0x0F12B0556
 	call SW2_GetSyscallNumber  
 	add rsp, 0x28
 	mov rcx, [rsp +8]          
@@ -359,7 +258,6 @@ proc NtCreateThreadEx*(ThreadHandle: PHANDLE, DesiredAccess: ACCESS_MASK, Object
 	mov r8, [rsp+24]
 	mov r9, [rsp+32]
 	mov r10, rcx
-	nop
 	syscall                    
 	ret
     """
@@ -371,7 +269,7 @@ proc NtWaitForSingleObject*(ObjectHandle: HANDLE, Alertable: BOOLEAN, TimeOut: P
 	mov [rsp+24], r8
 	mov [rsp+32], r9
 	sub rsp, 0x28
-	mov ecx, 0x008A92015
+	mov ecx, 0x084B70CAB
 	call SW2_GetSyscallNumber  
 	add rsp, 0x28
 	mov rcx, [rsp +8]          
@@ -379,7 +277,6 @@ proc NtWaitForSingleObject*(ObjectHandle: HANDLE, Alertable: BOOLEAN, TimeOut: P
 	mov r8, [rsp+24]
 	mov r9, [rsp+32]
 	mov r10, rcx
-	nop
 	syscall                    
 	ret
     """

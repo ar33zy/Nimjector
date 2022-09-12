@@ -1,6 +1,4 @@
-import base64, endians
-import winim
-import winim/lean
+REPLACE_MODULES
 
 REPLACE_INIT_SETUP
 

@@ -5,3 +5,4 @@ payload.nim
 test.exe
 test.nim
 todo
+*.swp

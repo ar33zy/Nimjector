@@ -1,1 +1,1 @@
-NtWaitForSingleObject(targetHandle, TRUE, NULL)
+res = NtWaitForSingleObject(targetHandle, TRUE, NULL)

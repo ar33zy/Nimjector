@@ -4,6 +4,8 @@
   ntdll: NtAllocateVirtualMemory
 - name: RtlCopyMemory
   ntdll: NtWriteVirtualMemory
+- name: WriteProcessMemory
+  ntdll: NtWriteVirtualMemory
 - name: CreateThread
   ntdll: NtCreateThreadEx
 - name: CreateRemoteThread

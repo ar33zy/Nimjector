@@ -15,7 +15,15 @@ type Arguments = object
 
 type InitSetup = object
   name: string
-  setup: string
+  setup: seq[string]
+
+type Modules = object
+  name: string 
+  modules: seq[string]
+
+type NtdllCalls = object
+  name: string 
+  ntdll: string
 
 proc init_setup(file_name: string): seq[InitSetup] =
   var initSetup: seq[InitSetup]
@@ -24,6 +32,22 @@ proc init_setup(file_name: string): seq[InitSetup] =
   s.close()
 
   return initSetup
+
+proc module_setup(file_name: string): seq[Modules] =
+  var moduleSetup: seq[Modules]
+  var s = newFileStream(file_name)
+  load(s, moduleSetup)
+  s.close()
+
+  return moduleSetup 
+
+proc ntdll_setup(file_name: string): seq[NtdllCalls] =
+  var ntdllSetup: seq[NtdllCalls]
+  var s = newFileStream(file_name)
+  load(s, ntdllSetup)
+  s.close()
+
+  return ntdllSetup
 
 proc get_techniques(file_name: string): seq[Technique] =
   var techniqueList: seq[Technique]
@@ -63,18 +87,58 @@ proc indent_lines(lines: string, indent: int): string =
   
   return join(indented, "\n")
 
-proc get_init_setup(technique: string): string = 
+proc get_modules(technique: string, variation: string): string = 
+  var modules = newseq[string]()
+  modules.add("import base64")
+  modules.add("import winim")
+  modules.add("import winim/lean")
+
+  if variation == "syscalls":
+    modules.add("include syscalls")
+    return join(modules, "\n")
+
+  let module_list = module_setup("models/modules.yml")
+  for i in module_list:
+    if i.name == technique:
+      for j in i.modules:
+        modules.add(j)
+
+  return join(modules, "\n")
+
+proc k32_to_nt(call: string, ntdll_calls: seq[NtdllCalls]): string = 
+  for i in ntdll_calls:
+    if i.name == call:
+      return i.ntdll
+  return ""
+
+ 
+proc get_init_setup(technique: string, technique_list: seq, variation: string): string = 
   let setup_list = init_setup("models/init_setup.yml")
-  var setup_contents: string = ""
+  let ntdll_calls = ntdll_setup("models/k32_to_nt.yml")
+  let calls = get_calls(technique_list, technique)
+
+  var setup_contents: string
+  var combined_setup = newSeq[string]()
 
   for i in setup_list:
     if i.name == technique:
-      setup_contents = readFile(fmt"inits/{i.setup}.nim")
+      for j in i.setup:
+        setup_contents = readFile(fmt"inits/{j}.nim")
+        combined_setup.add(setup_contents)
+  
+  if variation == "ntdll":
+    for i in calls:
+      var api_call = k32_to_nt(i, ntdll_calls)
+      if api_call != "":
+        setup_contents = readFile(fmt"inits/{api_call}.nim")
+        combined_setup.add(setup_contents)
+  
+  return join(combined_setup, "\n")
 
-  return setup_contents
- 
-proc build_template(technique: string, technique_list: seq): string = 
+proc build_template(technique: string, technique_list: seq, variation: string): string = 
   let argument_list = custom_arguments("models/custom_arguments.yml")
+  let ntdll_calls = ntdll_setup("models/k32_to_nt.yml")
+  let ntdll_variations = @["ntdll", "syscalls", "gstub"]
   
   let calls = get_calls(technique_list, technique)
   let arguments = get_arguments(argument_list, technique)
@@ -84,16 +148,21 @@ proc build_template(technique: string, technique_list: seq): string =
   var content: string = ""
   
   for call in calls:
+    var api_call = call
+    var temp = k32_to_nt(call, ntdll_calls)
+    if contains(ntdll_variations, variation) and temp != "":
+      api_call = k32_to_nt(call, ntdll_calls)
+    
     content = ""
     for custom_arg in arguments:
-      if custom_arg.api_call == call:
+      if custom_arg.api_call == api_call:
         content = readFile(fmt"custom/{custom_arg.fn_template}.nim")
         if not checker.contains(content):
           checker.add(content)
           break
 
     if content == "":      
-      content = readFile(fmt"functions/{call}.nim")
+      content = readFile(fmt"functions/{api_call}.nim")
       checker.add(content)
     api_template.add(content)
 
