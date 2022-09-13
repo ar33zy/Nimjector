@@ -94,7 +94,7 @@ proc get_modules(technique: string, variation: string): string =
   modules.add("import winim/lean")
 
   if variation == "syscalls":
-    modules.add("include syscalls")
+    modules.add("include utils/syscalls")
     return join(modules, "\n")
 
   let module_list = module_setup("models/modules.yml")
