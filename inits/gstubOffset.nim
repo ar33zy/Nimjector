@@ -1,0 +1,1 @@
+var syscallStub_REPLACE_COUNT: HANDLE = cast[HANDLE](syscallStub_REPLACE_PREV) + cast[HANDLE](SYSCALL_STUB_SIZE)

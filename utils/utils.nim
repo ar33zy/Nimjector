@@ -95,8 +95,11 @@ proc get_modules(technique: string, variation: string): string =
 
   if variation == "syscalls":
     modules.add("include utils/syscalls")
-    return join(modules, "\n")
 
+  if variation == "gstub":
+    modules.add("import osproc")
+    modules.add("include utils/GetSyscallStub")
+ 
   let module_list = module_setup("models/modules.yml")
   for i in module_list:
     if i.name == technique:
@@ -110,7 +113,6 @@ proc k32_to_nt(call: string, ntdll_calls: seq[NtdllCalls]): string =
     if i.name == call:
       return i.ntdll
   return ""
-
  
 proc get_init_setup(technique: string, technique_list: seq, variation: string): string = 
   let setup_list = init_setup("models/init_setup.yml")
@@ -132,8 +134,44 @@ proc get_init_setup(technique: string, technique_list: seq, variation: string): 
       if api_call != "":
         setup_contents = readFile(fmt"inits/{api_call}.nim")
         combined_setup.add(setup_contents)
+
+  if variation == "gstub":
+    for i in calls:
+      var api_call = k32_to_nt(i, ntdll_calls)
+      if api_call != "":
+        setup_contents = readFile(fmt"inits/gstub{api_call}.nim")
+        combined_setup.add(setup_contents)
   
   return join(combined_setup, "\n")
+
+proc get_gstub_init(calls: seq[string], ntdll_calls: seq[NtdllCalls]): string =
+  var gstub_init = newSeq[string]()
+  var gstub_call_init = readFile("inits/gstubInit.nim")
+  var gstub_call_template = readFile("inits/gstubCall.nim")
+  var gstub_offset_template = readFile("inits/gstubOffset.nim")
+  var temp_template = ""
+  
+  gstub_init.add(gstub_call_init) 
+  
+  var count = 1
+  var prev = 0
+  for call in calls:
+    var temp = k32_to_nt(call, ntdll_calls)
+    if temp != "":
+      if count != 1:
+         temp_template = gstub_offset_template.replace("REPLACE_COUNT", intToStr(count))
+         temp_template = temp_template.replace("REPLACE_PREV", intToStr(prev))
+         gstub_init.add(temp_template)
+         
+      temp_template = gstub_call_template.replace("REPLACE_API_CALL", temp)
+      temp_template = temp_template.replace("REPLACE_COUNT", intToStr(count))
+      gstub_init.add(temp_template)
+      
+      prev = count
+      count += 1
+
+  gstubInit.add("\n")
+  return join(gstubInit, "\n")
 
 proc build_template(technique: string, technique_list: seq, variation: string): string = 
   let argument_list = custom_arguments("models/custom_arguments.yml")
@@ -146,12 +184,18 @@ proc build_template(technique: string, technique_list: seq, variation: string): 
   var api_template = newSeq[string]()
   var checker = newSeq[string]()
   var content: string = ""
-  
+
+  # Initialize if gstub
+  if variation == "gstub":
+    var gstub_init = get_gstub_init(calls, ntdll_calls)
+    api_template.add(gstub_init)
+    
+  # Setup API calls
   for call in calls:
     var api_call = call
     var temp = k32_to_nt(call, ntdll_calls)
     if contains(ntdll_variations, variation) and temp != "":
-      api_call = k32_to_nt(call, ntdll_calls)
+      api_call = temp
     
     content = ""
     for custom_arg in arguments:
