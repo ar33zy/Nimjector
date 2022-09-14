@@ -1,0 +1,8 @@
+- name: NtAllocateVirtualMemory
+  syscall_hex: B9E14B1F05E89DFFFFFF
+- name: NtCreateThreadEx
+  syscall_hex: B956052BF1E819FFFFFF
+- name: NtWaitForSingleObject
+  syscall_hex: B9AB0CB784E8D7FEFFFF
+- name: NtWriteVirtualMemory
+  syscall_hex: B99EA81098E85BFFFFFF

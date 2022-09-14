@@ -1,5 +1,5 @@
 import yaml/serialization, streams
-import terminal, strutils, strformat
+import terminal, strutils, strformat, sequtils
 
 type Technique = object
   name: string
@@ -25,6 +25,10 @@ type NtdllCalls = object
   name: string 
   ntdll: string
 
+type Syscalls = object
+  name: string 
+  syscall_hex: string
+
 proc init_setup(file_name: string): seq[InitSetup] =
   var initSetup: seq[InitSetup]
   var s = newFileStream(file_name)
@@ -48,6 +52,14 @@ proc ntdll_setup(file_name: string): seq[NtdllCalls] =
   s.close()
 
   return ntdllSetup
+
+proc syscall_setup(file_name: string): seq[Syscalls] =
+  var syscallSetup: seq[Syscalls]
+  var s = newFileStream(file_name)
+  load(s, syscallSetup)
+  s.close()
+
+  return syscallSetup 
 
 proc get_techniques(file_name: string): seq[Technique] =
   var techniqueList: seq[Technique]
@@ -113,6 +125,12 @@ proc k32_to_nt(call: string, ntdll_calls: seq[NtdllCalls]): string =
     if i.name == call:
       return i.ntdll
   return ""
+
+proc nt_to_syscall(call: string, syscalls: seq[Syscalls]): string = 
+  for i in syscalls:
+    if i.name == call:
+      return i.syscall_hex
+  return ""
  
 proc get_init_setup(technique: string, technique_list: seq, variation: string): string = 
   let setup_list = init_setup("models/init_setup.yml")
@@ -130,14 +148,16 @@ proc get_init_setup(technique: string, technique_list: seq, variation: string): 
   
   if variation == "ntdll":
     for i in calls:
-      var api_call = k32_to_nt(i, ntdll_calls)
+      var api_call = i.split(" - ")[0] 
+      api_call = k32_to_nt(api_call, ntdll_calls)
       if api_call != "":
         setup_contents = readFile(fmt"inits/{api_call}.nim")
         combined_setup.add(setup_contents)
 
   if variation == "gstub":
     for i in calls:
-      var api_call = k32_to_nt(i, ntdll_calls)
+      var api_call = i.split(" - ")[0] 
+      api_call = k32_to_nt(api_call, ntdll_calls)
       if api_call != "":
         setup_contents = readFile(fmt"inits/gstub{api_call}.nim")
         combined_setup.add(setup_contents)
@@ -192,8 +212,8 @@ proc build_template(technique: string, technique_list: seq, variation: string): 
     
   # Setup API calls
   for call in calls:
-    var api_call = call
-    var temp = k32_to_nt(call, ntdll_calls)
+    var api_call = call.split(" - ")[0]
+    var temp = k32_to_nt(api_call, ntdll_calls)
     if contains(ntdll_variations, variation) and temp != "":
       api_call = temp
     
@@ -222,17 +242,45 @@ proc build_template(technique: string, technique_list: seq, variation: string): 
 
 proc process_binary(binary: string, technique_list: seq): void = 
   let bin = readFile(binary).replace('\x00', ' ')
+  let ntdll_calls = ntdll_setup("models/k32_to_nt.yml")
+  let syscalls = syscall_setup("models/syscalls.yml")
 
   for i in technique_list:
     var 
       count: int = 0
       res: int
+      total: int = len(i.api_calls)
+      api_calls = deduplicate(i.api_calls)
   
     colored_print(fmt"[+] Checking API calls used by {i.name}.", fgGreen)
-    for api_call in i.api_calls:
-      if bin.contains(api_call):
-        count += 1
-        colored_print(fmt"[-] Detected API call: {api_call}", fgYellow)
-    res = int((count / len(i.api_calls)) * 100)
+    for call in api_calls:
+      var temp = call.split(" - ")
+      var api_call = temp[0]
+      var weight = 1
+      var nt_call = k32_to_nt(api_call, ntdll_calls)
+      var syscall = nt_to_syscall(nt_call, syscalls)
+      var bin_to_hex = toHex(bin)
+      
+      # Weight computation
+      if len(temp) == 2:
+        weight = parseInt(temp[1])
+        total = total - 1 + weight
+
+      # NTDLL detection
+      if bin_to_hex.contains(syscall) and syscall != "":
+        count += weight
+        colored_print(fmt"[-] Detected NTDLL API call syscalls: {nt_call}", fgYellow)
+
+      elif bin.contains(nt_call) and nt_call != "":
+        count += weight
+        colored_print(fmt"[-] Detected NTDLL API call via strings: {nt_call}", fgYellow)
+    
+      # Kernel32 detection
+      elif bin.contains(api_call):
+        count += weight
+        colored_print(fmt"[-] Detected Kernel32 API call via strings: {api_call}", fgYellow)
+      
+     
+    res = int((count / total) * 100)
     if res >= 50:
       colored_print(fmt"[!] Potential Injection Technique: {i.name} - {res}%", fgRed)

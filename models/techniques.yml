@@ -2,23 +2,23 @@
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - CreateThread
+    - CreateThread - 5
     - WaitForSingleObject
 - name: create_remote_thread
   api_calls:
     - OpenProcess
     - VirtualAllocEx
     - WriteProcessMemory
-    - CreateRemoteThread
+    - CreateRemoteThread - 5
     - CloseHandle
 - name: process_hollowing
   api_calls:
-    - CreateProcess
-    - ZwQueryInformationProcess
+    - CreateProcess - 2
+    - ZwQueryInformationProcess - 3
     - ReadProcessMemory
     - ReadProcessMemory
     - WriteProcessMemory
-    - ResumeThread
+    - ResumeThread - 2
 - name: apc_queue
   api_calls:
     - CreateToolhelp32Snapshot
@@ -31,249 +31,249 @@
     - VirtualProtectEx
     - Thread32First
     - Thread32Next
-    - OpenThread 
-    - QueueUserAPC
+    - OpenThread - 2
+    - QueueUserAPC - 5
 - name: cert_enum_system_store_location
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - CertEnumSystemStoreLocation
+    - CertEnumSystemStoreLocation - 5
 - name: cert_enum_system_store
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - CertEnumSystemStore
+    - CertEnumSystemStore - 5
 - name: create_fiber
   api_calls:
-    - ConvertThreadToFiber
+    - ConvertThreadToFiber - 3
     - VirtualAlloc
     - RtlCopyMemory
-    - CreateFiber
-    - SwitchToFiber
+    - CreateFiber - 2
+    - SwitchToFiber - 3
 - name: create_threadpool_wait
   api_calls:
     - CreateEvent
     - VirtualAlloc
     - RtlCopyMemory
-    - CreateThreadpoolWait
-    - SetThreadpoolWait
+    - CreateThreadpoolWait - 2
+    - SetThreadpoolWait - 3
     - WaitForSingleObject
 - name: create_timer_queue_timer
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - CreateTimerQueue
+    - CreateTimerQueue - 2
     - CreateEvent
-    - CreateTimerQueueTimer
+    - CreateTimerQueueTimer - 3
     - WaitForSingleObject
 - name: crypt_enum_oid_info
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - CryptEnumOIDInfo
+    - CryptEnumOIDInfo - 5
 - name: early_bird_apc_queue
   api_calls:
     - CreateProcess
     - VirtualAllocEx
     - WriteProcessMemory
     - VirtualProtectEx
-    - QueueUserAPC 
-    - ResumeThread
+    - QueueUserAPC - 3
+    - ResumeThread - 2
 - name: enum_calendar_info_w
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - EnumCalendarInfoW
+    - EnumCalendarInfoW - 5
 - name: enum_child_windows
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - EnumChildWindows
+    - EnumChildWindows - 5
 - name: enum_date_formats_a
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - EnumDateFormatsA
+    - EnumDateFormatsA - 5
 - name: enum_desktops_w
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - GetProcessWindowStation
-    - EnumDesktopsW
+    - EnumDesktopsW - 5
 - name: enum_desktop_windows
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - GetCurrentThreadId
     - GetThreadDesktop
-    - EnumDesktopWindows
+    - EnumDesktopWindows - 5
 - name: enum_display_monitors
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - EnumDisplayMonitors 
+    - EnumDisplayMonitors - 5
 - name: enumerate_loaded_modules
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - GetCurrentProcess
-    - EnumerateLoadedModules
+    - EnumerateLoadedModules - 5
 - name: enum_font_families_ex_w
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - GetDC
-    - EnumFontFamiliesExW
+    - EnumFontFamiliesExW - 5
 - name: enum_fonts_w
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - GetDC
-    - EnumFontsW
+    - EnumFontsW - 5
 - name: enum_language_group_locales
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - EnumLanguageGroupLocalesW
+    - EnumLanguageGroupLocalesW - 5
 - name: enum_objects
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - GetDC
-    - EnumObjects
+    - EnumObjects - 5
 - name: enum_pages_files_w
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - EnumPageFilesW
+    - EnumPageFilesW - 5
 - name: enum_pwr_schemes
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - EnumPwrSchemes
+    - EnumPwrSchemes - 5
 - name: enum_resources_types_ex_w
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - LoadLibraryW
-    - EnumResourceTypesExW
+    - EnumResourceTypesExW - 5
 - name: enum_resources_types_w
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - LoadLibraryW
-    - EnumResourceTypesW
+    - EnumResourceTypesW - 5
 - name: enum_system_codepages_a
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - EnumSystemCodePagesA
+    - EnumSystemCodePagesA - 5
 - name: enum_system_codepages_w
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - EnumSystemCodePagesW
+    - EnumSystemCodePagesW - 5
 - name: enum_system_geo_id
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - EnumSystemGeoID
+    - EnumSystemGeoID - 5
 - name: enum_system_language_groups_a
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - EnumSystemLanguageGroupsA
+    - EnumSystemLanguageGroupsA - 5
 - name: enum_system_locales_ex
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - EnumSystemLocalesEx
+    - EnumSystemLocalesEx - 5
 - name: enum_system_locales_a
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - EnumSystemLocalesA
+    - EnumSystemLocalesA - 5
 - name: enum_thread_windows
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - EnumThreadWindows
+    - EnumThreadWindows - 5
 - name: enum_time_formats_a
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - EnumTimeFormatsA
+    - EnumTimeFormatsA - 5
 - name: enum_time_formats_ex
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - EnumTimeFormatsEx
+    - EnumTimeFormatsEx - 5
 - name: enum_ui_languages_a
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - EnumUILanguagesA
+    - EnumUILanguagesA - 5
 - name: enum_ui_languages_w
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - EnumUILanguagesW
+    - EnumUILanguagesW - 5
 - name: enum_windows
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - EnumWindows
+    - EnumWindows - 5
 - name: enum_window_stations_w
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - EnumWindowStationsW
+    - EnumWindowStationsW - 5
 - name: fiber_context_edit
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - ConvertThreadToFiber
-    - CreateFiber
+    - ConvertThreadToFiber - 2
+    - CreateFiber - 2
     - RtlMoveMemory
-    - SwitchToFiber
+    - SwitchToFiber - 3
 - name: image_get_digest_stream
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
     - CreateFileW
-    - ImageGetDigestStream
+    - ImageGetDigestStream - 5
     - CloseHandle
 - name: imm_enum_input_context
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - ImmEnumInputContext
+    - ImmEnumInputContext - 5
 - name: init_once_execute_once
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - InitOnceExecuteOnce
+    - InitOnceExecuteOnce - 5
 - name: set_timer
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - SetTimer
-    - GetMessageW
+    - SetTimer - 3
+    - GetMessageW - 2
     - DispatchMessageW
 - name: setup_commit_file_queue_w
   api_calls:
     - VirtualAlloc
     - RtlCopyMemory
-    - SetupOpenFileQueue
-    - SetupQueueCopyW
+    - SetupOpenFileQueue - 2
+    - SetupQueueCopyW - 2
     - GetTopWindow
-    - SetupCommitFileQueueW
+    - SetupCommitFileQueueW - 3
 - name: suspended_thread
   api_calls:
     - OpenProcess
     - VirtualAllocEx
     - WriteProcessMemory
     - VirtualProtect
-    - CreateRemoteThread
+    - CreateRemoteThread - 2
     - VirtualProtect
-    - ResumeThread
+    - ResumeThread - 4
