@@ -274,6 +274,6 @@
     - VirtualAllocEx
     - WriteProcessMemory
     - VirtualProtect
-    - CreateRemoteThread - 2
+    - CreateRemoteThread
     - VirtualProtect
-    - ResumeThread - 4
+    - ResumeThread - 5

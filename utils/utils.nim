@@ -176,7 +176,8 @@ proc get_gstub_init(calls: seq[string], ntdll_calls: seq[NtdllCalls]): string =
   var count = 1
   var prev = 0
   for call in calls:
-    var temp = k32_to_nt(call, ntdll_calls)
+    var api_call = call.split(" - ")[0] 
+    var temp = k32_to_nt(api_call, ntdll_calls)
     if temp != "":
       if count != 1:
          temp_template = gstub_offset_template.replace("REPLACE_COUNT", intToStr(count))
@@ -280,7 +281,6 @@ proc process_binary(binary: string, technique_list: seq): void =
         count += weight
         colored_print(fmt"[-] Detected Kernel32 API call via strings: {api_call}", fgYellow)
       
-     
     res = int((count / total) * 100)
     if res >= 50:
       colored_print(fmt"[!] Potential Injection Technique: {i.name} - {res}%", fgRed)

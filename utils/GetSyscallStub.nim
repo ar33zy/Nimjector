@@ -3,7 +3,6 @@
     License: BSD 3-Clause
 ]#
 
-import winim
 import strutils
 import ptr_math
 
@@ -70,8 +69,6 @@ proc GetSyscallStub*(functionName: LPCSTR, syscallStub: LPVOID): BOOL =
     var addressOfNames: PDWORD = cast[PDWORD](RVAtoRawOffset(cast[DWORD_PTR](fileData) + cast[DWORD_PTR](exportDirectory.AddressOfNames), rdataSection))
     var addressOfFunctions: PDWORD = cast[PDWORD](RVAtoRawOffset(cast[DWORD_PTR](fileData) + cast[DWORD_PTR](exportDirectory.AddressOfFunctions), rdataSection))
     var stubFound: BOOL = 0
-    var oldProtection: DWORD = 0
-    let low2: int = 0
     for low2 in 0 ..< exportDirectory.NumberOfNames:
         var functionNameVA: DWORD_PTR = cast[DWORD_PTR](RVAtoRawOffset(cast[DWORD_PTR](fileData) + addressOfNames[low2], rdataSection))
         var functionVA: DWORD_PTR = cast[DWORD_PTR](RVAtoRawOffset(cast[DWORD_PTR](fileData) + addressOfFunctions[low2 + 1], textSection))
