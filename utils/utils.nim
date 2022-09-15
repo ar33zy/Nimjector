@@ -9,7 +9,7 @@ type ApiCall = object
   api_call: string
   fn_template: string
 
-type Arguments = object
+type Arguments = object 
   name: string
   calls: seq[ApiCall]
 
@@ -77,6 +77,14 @@ proc custom_arguments(file_name: string): seq[Arguments] =
 
   return customArguments
 
+proc get_all_techniques(technique_list: seq[Technique]): seq[string] =
+  var all_techniques = newSeq[string]()
+  for i in technique_list:
+    all_techniques.add(i.name)
+
+  return all_techniques
+
+
 proc get_calls(technique_list: seq[Technique], technique: string): seq[string] = 
   for i in technique_list:
     if i.name == technique:
@@ -90,6 +98,7 @@ proc get_arguments(argument_list: seq[Arguments], technique: string): seq[ApiCal
 proc colored_print(to_print: string, color: ForegroundColor): void = 
   setForegroundColor(color)
   echo to_print
+  setForegroundColor(fgWhite)
 
 proc indent_lines(lines: string, indent: int): string = 
   var indented = newSeq[string]()
@@ -217,17 +226,19 @@ proc build_template(technique: string, technique_list: seq, variation: string): 
     var temp = k32_to_nt(api_call, ntdll_calls)
     if contains(ntdll_variations, variation) and temp != "":
       api_call = temp
-    
+
     content = ""
     for custom_arg in arguments:
       if custom_arg.api_call == api_call:
         content = readFile(fmt"custom/{custom_arg.fn_template}.nim")
         if not checker.contains(content):
           checker.add(content)
+          colored_print(fmt"[+] API call used: {api_call}", fgGreen)
           break
 
     if content == "":      
       content = readFile(fmt"functions/{api_call}.nim")
+      colored_print(fmt"[+] API call used: {api_call}", fgGreen)
       checker.add(content)
     api_template.add(content)
 

@@ -5,6 +5,7 @@ let doc = """
 Nimjector v 1.0
 
 Usage:
+  nimjector list -t <technique_name> [-c call]
   nimjector red -i <shellcode> -t <technique_name> [-P] [-p <process_name>] [-n]
   nimjector red -i <shellcode> -t <technique_name> [-P] [-p <process_name>] [-s] 
   nimjector red -i <shellcode> -t <technique_name> [-P] [-p <process_name>] [-g] 
@@ -17,7 +18,8 @@ Options:
   --version     		Show version.
   -i --image shellcode.bin	File to load
   -f --file binary		Binary to analyze
-  -t --technique technique_name Name of technique
+  -t --technique technique_name Name of technique (For list: use "all" to print all available techniques)
+  -c --call  			Print specific API call (For list: use "all" to print all available calls)
   -P --print  			Print the template instead of writing into a file
   -p --process 			Target process to be spawned or injected
   -e --encrypt 			Encrypts the shellcode 
@@ -30,11 +32,38 @@ var template_output: string = "payload.nim"
 
 let args = docopt(doc, version = "Nimjector 1.0")
 let technique_list = get_techniques("models/techniques.yml")
+let all_techniques = get_all_techniques(technique_list)
 
+# For listing techniques or calls
+if args["list"]:
+  let technique = $args["--technique"]
+  let call = $args["--call"]
+
+  if contains(all_techniques, technique) or technique == "all":
+    let calls = get_calls(technique_list, technique)
+    if technique == "all":
+      colored_print(fmt"[+] Available techniques - {intToStr(all_techniques.len)}", fgGreen)
+      for i in all_techniques:
+        colored_print(fmt"[-] {i}", fgGreen)
+    else:
+      if contains(calls, call) or call == "all" or call == "false":
+        colored_print(fmt"[+] Technique: {technique}", fgGreen)
+        colored_print(fmt"[-] Calls:", fgGreen)
+        for i in calls:
+          var split_call = i.split(" - ")[0]
+          colored_print(fmt"[-] {split_call}", fgGreen)
+
+      else:
+        colored_print(fmt"[-] API Call not found - {call}", fgRed)
+
+  else:
+    colored_print(fmt"[-] Technique not found - {technique}", fgRed)
+  
 # For payload creation
 if args["red"]:
-  let technique = $args["--technique"]
   let shellcode_file = $args["--image"]
+  let technique = $args["--technique"]
+  
 
   # For spawning remote processes
   var process = $args["--process"]
