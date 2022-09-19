@@ -12,3 +12,15 @@
   ntdll: NtCreateThreadEx
 - name: WaitForSingleObject
   ntdll: NtWaitForSingleObject
+- name: OpenProcess
+  ntdll: NtOpenProcess
+- name: ResumeThread
+  ntdll: NtResumeThread
+- name: OpenThread
+  ntdll: NtOpenThread
+- name: CloseHandle
+  ntdll: NtClose
+- name: ReadProcessMemory
+  ntdll: NtReadVirtualMemory
+- name: QueueUserAPC
+  ntdll: NtQueueApcThread

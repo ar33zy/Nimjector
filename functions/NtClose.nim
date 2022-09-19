@@ -1,0 +1,1 @@
+res = NtClose(targetHandle) 

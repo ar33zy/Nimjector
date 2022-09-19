@@ -50,3 +50,8 @@
     fn_template: apc_queue_open_thread
   - api_call: QueueUserAPC
     fn_template: apc_queue_queue_user_apc
+- name: vanilla
+  calls:
+  - api_call: NtAllocateVirtualMemory
+    fn_template: nt_virtual_alloc
+

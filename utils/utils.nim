@@ -267,6 +267,10 @@ proc build_template(technique: string, technique_list: seq, variation: string): 
   var checker = newSeq[string]()
   var content: string = ""
 
+  # Initialize res var if ntdll / syscall / gstub
+  if contains(ntdll_variations, variation):
+    api_template.add("var res: WINBOOL\n")
+
   # Initialize if gstub
   if variation == "gstub":
     var gstub_init = get_gstub_init(calls, ntdll_calls)
