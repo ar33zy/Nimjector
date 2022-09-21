@@ -1,26 +1,5 @@
 {.passC:"-masm=intel".}
 
-type
-  PS_ATTR_UNION* {.pure, union.} = object
-    Value*: ULONG
-    ValuePtr*: PVOID
-  PS_ATTRIBUTE* {.pure.} = object
-    Attribute*: ULONG 
-    Size*: SIZE_T
-    u1*: PS_ATTR_UNION
-    ReturnLength*: PSIZE_T
-  PPS_ATTRIBUTE* = ptr PS_ATTRIBUTE
-  PS_ATTRIBUTE_LIST* {.pure.} = object
-    TotalLength*: SIZE_T
-    Attributes*: array[2, PS_ATTRIBUTE]
-  PPS_ATTRIBUTE_LIST* = ptr PS_ATTRIBUTE_LIST
-  KNORMAL_ROUTINE* {.pure.} = object
-    NormalContext*: PVOID
-    SystemArgument1*: PVOID
-    SystemArgument2*: PVOID
-  PKNORMAL_ROUTINE* = ptr KNORMAL_ROUTINE
-
-
 {.emit: """
 #pragma once
 
@@ -32,7 +11,7 @@ type
 
 #include <windows.h>
 
-#define SW2_SEED 0xE91A5789
+#define SW2_SEED 0x8D4D48D2
 #define SW2_ROL8(v) (v << 8 | v >> 24)
 #define SW2_ROR8(v) (v >> 8 | v << 24)
 #define SW2_ROX8(v) ((SW2_SEED % 2) ? SW2_ROL8(v) : SW2_ROR8(v))
@@ -212,7 +191,7 @@ proc NtAllocateVirtualMemory*(ProcessHandle: HANDLE, BaseAddress: PVOID, ZeroBit
 	mov [rsp+24], r8
 	mov [rsp+32], r9
 	sub rsp, 0x28
-	mov ecx, 0x0051F4BE1
+	mov ecx, 0x0019C190B
 	call SW2_GetSyscallNumber  
 	add rsp, 0x28
 	mov rcx, [rsp +8]          
@@ -231,7 +210,7 @@ proc NtWriteVirtualMemory*(ProcessHandle: HANDLE, BaseAddress: PVOID, Buffer: PV
 	mov [rsp+24], r8
 	mov [rsp+32], r9
 	sub rsp, 0x28
-	mov ecx, 0x09810A89E
+	mov ecx, 0x009950317
 	call SW2_GetSyscallNumber  
 	add rsp, 0x28
 	mov rcx, [rsp +8]          
@@ -250,7 +229,7 @@ proc NtCreateThreadEx*(ThreadHandle: PHANDLE, DesiredAccess: ACCESS_MASK, Object
 	mov [rsp+24], r8
 	mov [rsp+32], r9
 	sub rsp, 0x28
-	mov ecx, 0x0F12B0556
+	mov ecx, 0x086A7059D
 	call SW2_GetSyscallNumber  
 	add rsp, 0x28
 	mov rcx, [rsp +8]          
@@ -269,7 +248,121 @@ proc NtWaitForSingleObject*(ObjectHandle: HANDLE, Alertable: BOOLEAN, TimeOut: P
 	mov [rsp+24], r8
 	mov [rsp+32], r9
 	sub rsp, 0x28
-	mov ecx, 0x084B70CAB
+	mov ecx, 0x026B81025
+	call SW2_GetSyscallNumber  
+	add rsp, 0x28
+	mov rcx, [rsp +8]          
+	mov rdx, [rsp+16]
+	mov r8, [rsp+24]
+	mov r9, [rsp+32]
+	mov r10, rcx
+	syscall                    
+	ret
+    """
+
+proc NtCreateProcess*(ProcessHandle: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: POBJECT_ATTRIBUTES, ParentProcess: HANDLE, InheritObjectTable: BOOLEAN, SectionHandle: HANDLE, DebugPort: HANDLE, ExceptionPort: HANDLE): NTSTATUS {.asmNoStackFrame.} =
+    asm """
+	mov [rsp +8], rcx          
+	mov [rsp+16], rdx
+	mov [rsp+24], r8
+	mov [rsp+32], r9
+	sub rsp, 0x28
+	mov ecx, 0x0E1BF2BE3
+	call SW2_GetSyscallNumber  
+	add rsp, 0x28
+	mov rcx, [rsp +8]          
+	mov rdx, [rsp+16]
+	mov r8, [rsp+24]
+	mov r9, [rsp+32]
+	mov r10, rcx
+	syscall                    
+	ret
+    """
+
+proc NtOpenProcess*(ProcessHandle: PHANDLE, DesiredAccess: ACCESS_MASK, ObjectAttributes: POBJECT_ATTRIBUTES, ClientId: PCLIENT_ID): NTSTATUS {.asmNoStackFrame.} =
+    asm """
+	mov [rsp +8], rcx          
+	mov [rsp+16], rdx
+	mov [rsp+24], r8
+	mov [rsp+32], r9
+	sub rsp, 0x28
+	mov ecx, 0x040D4434A
+	call SW2_GetSyscallNumber  
+	add rsp, 0x28
+	mov rcx, [rsp +8]          
+	mov rdx, [rsp+16]
+	mov r8, [rsp+24]
+	mov r9, [rsp+32]
+	mov r10, rcx
+	syscall                    
+	ret
+    """
+
+proc NtResumeThread*(ThreadHandle: HANDLE, PreviousSuspendCount: PULONG): NTSTATUS {.asmNoStackFrame.} =
+    asm """
+	mov [rsp +8], rcx          
+	mov [rsp+16], rdx
+	mov [rsp+24], r8
+	mov [rsp+32], r9
+	sub rsp, 0x28
+	mov ecx, 0x0183C5A95
+	call SW2_GetSyscallNumber  
+	add rsp, 0x28
+	mov rcx, [rsp +8]          
+	mov rdx, [rsp+16]
+	mov r8, [rsp+24]
+	mov r9, [rsp+32]
+	mov r10, rcx
+	syscall                    
+	ret
+    """
+
+proc NtClose*(Handle: HANDLE): NTSTATUS {.asmNoStackFrame.} =
+    asm """
+	mov [rsp +8], rcx          
+	mov [rsp+16], rdx
+	mov [rsp+24], r8
+	mov [rsp+32], r9
+	sub rsp, 0x28
+	mov ecx, 0x01B8B4C3A
+	call SW2_GetSyscallNumber  
+	add rsp, 0x28
+	mov rcx, [rsp +8]          
+	mov rdx, [rsp+16]
+	mov r8, [rsp+24]
+	mov r9, [rsp+32]
+	mov r10, rcx
+	syscall                    
+	ret
+    """
+
+proc NtReadVirtualMemory*(ProcessHandle: HANDLE, BaseAddress: PVOID, Buffer: PVOID, BufferSize: SIZE_T, NumberOfBytesRead: PSIZE_T): NTSTATUS {.asmNoStackFrame.} =
+    asm """
+	mov [rsp +8], rcx          
+	mov [rsp+16], rdx
+	mov [rsp+24], r8
+	mov [rsp+32], r9
+	sub rsp, 0x28
+	mov ecx, 0x01E7006E1
+	call SW2_GetSyscallNumber  
+	add rsp, 0x28
+	mov rcx, [rsp +8]          
+	mov rdx, [rsp+16]
+	mov r8, [rsp+24]
+	mov r9, [rsp+32]
+	mov r10, rcx
+	syscall                    
+	ret
+    """
+
+proc NtQueueApcThread*(ThreadHandle: HANDLE, ApcRoutine: PKNORMAL_ROUTINE, ApcArgument1: PVOID, ApcArgument2: PVOID, ApcArgument3: PVOID): NTSTATUS {.asmNoStackFrame.} =
+    asm """
+	mov [rsp +8], rcx          
+	mov [rsp+16], rdx
+	mov [rsp+24], r8
+	mov [rsp+32], r9
+	sub rsp, 0x28
+	mov ecx, 0x008A0C58E
 	call SW2_GetSyscallNumber  
 	add rsp, 0x28
 	mov rcx, [rsp +8]          

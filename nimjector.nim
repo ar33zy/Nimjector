@@ -63,6 +63,10 @@ if args["red"]:
   let shellcode_type = $args["--encrypt"]
   let technique = $args["--technique"]
 
+  if not contains(all_techniques, technique):
+    colored_print(fmt"[!] Technique not found: {technique}", fgRed)
+    quit(QuitSuccess)
+
   # For spawning remote processes
   var process = $args["--process"]
   if process == "nil":

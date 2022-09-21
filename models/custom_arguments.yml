@@ -12,6 +12,8 @@
   calls:
   - api_call: VirtualAllocEx
     fn_template: create_remote_thread_virtual_alloc_ex
+  - api_call: NtAllocateVirtualMemory
+    fn_template: nt_virtual_alloc_ex
 - name: suspended_thread
   calls:
   - api_call: VirtualProtect
@@ -50,8 +52,3 @@
     fn_template: apc_queue_open_thread
   - api_call: QueueUserAPC
     fn_template: apc_queue_queue_user_apc
-- name: vanilla
-  calls:
-  - api_call: NtAllocateVirtualMemory
-    fn_template: nt_virtual_alloc
-

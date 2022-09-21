@@ -1,1 +1,1 @@
-let event = CreateEvent(NULL, TRUE, FALSE, NULL)
+let targetHandle = CreateEvent(NULL, TRUE, FALSE, NULL)
