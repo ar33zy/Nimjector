@@ -32,6 +32,18 @@ type Syscalls = object
   name: string 
   syscall_hex: string
 
+type Info = object
+  name: string
+  info: string
+
+proc info_setup(file_name: string): seq[Info] =
+  var infoSetup: seq[Info]
+  var s = newFileStream(file_name)
+  load(s, infoSetup)
+  s.close()
+
+  return infoSetup 
+
 proc init_setup(file_name: string): seq[InitSetup] =
   var initSetup: seq[InitSetup]
   var s = newFileStream(file_name)
@@ -97,6 +109,12 @@ proc get_arguments(argument_list: seq[Arguments], technique: string): seq[ApiCal
   for i in argument_list:
     if i.name == technique:
       return i.calls
+
+proc get_info(info_list: seq[Info], technique: string): string = 
+  for i in info_list:
+    if i.name == technique and i.info != "":
+      return i.info
+  return "No information found"
 
 proc colored_print(to_print: string, color: ForegroundColor): void = 
   setForegroundColor(color)
@@ -311,6 +329,7 @@ proc process_binary(binary: string, technique_list: seq): void =
   let bin = readFile(binary).replace('\x00', ' ')
   let ntdll_calls = ntdll_setup("models/k32_to_nt.yml")
   let syscalls = syscall_setup("models/syscalls.yml")
+  let infos = info_setup("models/info.yml")
 
   for i in technique_list:
     var 
@@ -327,6 +346,8 @@ proc process_binary(binary: string, technique_list: seq): void =
       var nt_call = k32_to_nt(api_call, ntdll_calls)
       var syscall = nt_to_syscall(nt_call, syscalls)
       var bin_to_hex = toHex(bin)
+      var nt_info = get_info(infos, api_call)
+      var k32_info = get_info(infos, api_call)
       
       # Weight computation
       if len(temp) == 2:
@@ -337,15 +358,18 @@ proc process_binary(binary: string, technique_list: seq): void =
       if bin_to_hex.contains(syscall) and syscall != "":
         count += weight
         colored_print(fmt"[-] Detected NTDLL API call syscalls: {nt_call}", fgYellow)
-
+        colored_print(fmt"[+] {nt_info} - {nt_call}", fgGreen)
+          
       elif bin.contains(nt_call) and nt_call != "":
         count += weight
         colored_print(fmt"[-] Detected NTDLL API call via strings: {nt_call}", fgYellow)
+        colored_print(fmt"[+] {nt_info} - {nt_call}", fgGreen)
     
       # Kernel32 detection
       elif bin.contains(api_call):
         count += weight
         colored_print(fmt"[-] Detected Kernel32 API call via strings: {api_call}", fgYellow)
+        colored_print(fmt"[+] {k32_info} - {api_call}", fgGreen)
       
     res = int((count / total) * 100)
     if res >= 50:

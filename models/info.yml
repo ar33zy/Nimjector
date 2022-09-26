@@ -1,0 +1,159 @@
+- name: CertEnumSystemStore
+  info: 
+- name: CertEnumSystemStoreLocation
+  info: 
+- name: CloseHandle
+  info: 
+- name: ConvertThreadToFiber
+  info: 
+- name: CreateEvent
+  info: 
+- name: CreateFiber
+  info: 
+- name: CreateFileW
+  info: 
+- name: CreateProcess
+  info: 
+- name: CreateRemoteThread
+  info: 
+- name: CreateThread
+  info: 
+- name: CreateThreadpoolWait
+  info: 
+- name: CreateTimerQueue
+  info: 
+- name: CreateTimerQueueTimer
+  info: 
+- name: CreateToolhelp32Snapshot
+  info: 
+- name: CryptEnumOIDInfo
+  info: 
+- name: DispatchMessageW
+  info: 
+- name: EnumCalendarInfoW
+  info: 
+- name: EnumChildWindows
+  info: 
+- name: EnumDateFormatsA
+  info: 
+- name: EnumDesktopsW
+  info: 
+- name: EnumDesktopWindows
+  info: 
+- name: EnumDisplayMonitors
+  info: 
+- name: EnumerateLoadedModules
+  info: 
+- name: EnumFontFamiliesExW
+  info: 
+- name: EnumFontsW
+  info: 
+- name: EnumLanguageGroupLocalesW
+  info: 
+- name: EnumObjects
+  info: 
+- name: EnumPageFilesW
+  info: 
+- name: EnumPwrSchemes
+  info: 
+- name: EnumResourceTypesExW
+  info: 
+- name: EnumResourceTypesW
+  info: 
+- name: EnumSystemCodePagesA
+  info: 
+- name: EnumSystemCodePagesW
+  info: 
+- name: EnumSystemGeoID
+  info: 
+- name: EnumSystemLanguageGroupsA
+  info: 
+- name: EnumSystemLocalesA
+  info: 
+- name: EnumSystemLocalesEx
+  info: 
+- name: EnumThreadWindows
+  info: 
+- name: EnumTimeFormatsA
+  info: 
+- name: EnumTimeFormatsEx
+  info: 
+- name: EnumUILanguagesA
+  info: 
+- name: EnumUILanguagesW
+  info: 
+- name: EnumWindows
+  info: 
+- name: EnumWindowStationsW
+  info: 
+- name: GetCurrentProcess
+  info: 
+- name: GetCurrentThreadId
+  info: 
+- name: GetDC
+  info: 
+- name: GetMessageW
+  info: 
+- name: GetProcessWindowStation
+  info: 
+- name: GetThreadDesktop
+  info: 
+- name: GetTopWindow
+  info: 
+- name: ImageGetDigestStream
+  info: 
+- name: ImmEnumInputContext
+  info: 
+- name: InitOnceExecuteOnce
+  info: 
+- name: LoadLibraryW
+  info: 
+- name: OpenProcess
+  info: 
+- name: OpenThread
+  info: 
+- name: Process32First
+  info: 
+- name: Process32Next
+  info: 
+- name: QueueUserAPC
+  info: 
+- name: ReadProcessMemory
+  info: 
+- name: ResumeThread
+  info: 
+- name: RtlCopyMemory
+  info: 
+- name: RtlMoveMemory
+  info: 
+- name: SetThreadpoolWait
+  info: 
+- name: SetTimer
+  info: 
+- name: SetupCommitFileQueueW
+  info: 
+- name: SetupOpenFileQueue
+  info: 
+- name: SetupQueueCopyW
+  info: 
+- name: SwitchToFiber
+  info: 
+- name: Thread32First
+  info: 
+- name: Thread32Next
+  info: 
+- name: VirtualAlloc
+  info: 
+- name: VirtualAllocEx
+  info: 
+- name: VirtualProtect
+  info: 
+- name: VirtualProtectEx
+  info: 
+- name: WaitForSingleObject
+  info: 
+- name: WriteProcessMemory
+  info: 
+- name: ZwQueryInformationProcess
+  info: 
+
