@@ -99,7 +99,6 @@ proc get_all_techniques(technique_list: seq[Technique]): seq[string] =
 
   return all_techniques
 
-
 proc get_calls(technique_list: seq[Technique], technique: string): seq[string] = 
   for i in technique_list:
     if i.name == technique:
@@ -110,16 +109,19 @@ proc get_arguments(argument_list: seq[Arguments], technique: string): seq[ApiCal
     if i.name == technique:
       return i.calls
 
-proc get_info(info_list: seq[Info], technique: string): string = 
-  for i in info_list:
-    if i.name == technique and i.info != "":
-      return i.info
-  return "No information found"
-
 proc colored_print(to_print: string, color: ForegroundColor): void = 
   setForegroundColor(color)
   echo to_print
   setForegroundColor(fgWhite)
+
+proc print_info(info_list: seq[Info], technique: string): void = 
+  var count = 0
+  for i in info_list:
+    if i.name == technique and i.info != "":
+      colored_print(fmt"[!] {i.info}", fgYellow)
+      count += 1
+  if count == 0:
+    colored_print(fmt"[-] No information found - {technique}", fgRed)
 
 proc indent_lines(lines: string, indent: int, ignore_first: bool): string = 
   var indented = newSeq[string]()
@@ -276,6 +278,8 @@ proc get_gstub_init(calls: seq[string], ntdll_calls: seq[NtdllCalls]): string =
 proc build_template(technique: string, technique_list: seq, variation: string): string = 
   let argument_list = custom_arguments("models/custom_arguments.yml")
   let ntdll_calls = ntdll_setup("models/k32_to_nt.yml")
+  let infos = info_setup("models/info.yml")
+
   let ntdll_variations = @["ntdll", "syscalls", "gstub"]
   
   let calls = get_calls(technique_list, technique)
@@ -307,11 +311,13 @@ proc build_template(technique: string, technique_list: seq, variation: string): 
         if not checker.contains(content):
           checker.add(content)
           colored_print(fmt"[+] API call used: {api_call}", fgGreen)
+          print_info(infos, api_call)
           break
 
     if content == "":      
       content = readFile(fmt"functions/{api_call}.nim")
       colored_print(fmt"[+] API call used: {api_call}", fgGreen)
+      print_info(infos, api_call)
       checker.add(content)
     api_template.add(content)
 
@@ -346,8 +352,6 @@ proc process_binary(binary: string, technique_list: seq): void =
       var nt_call = k32_to_nt(api_call, ntdll_calls)
       var syscall = nt_to_syscall(nt_call, syscalls)
       var bin_to_hex = toHex(bin)
-      var nt_info = get_info(infos, api_call)
-      var k32_info = get_info(infos, api_call)
       
       # Weight computation
       if len(temp) == 2:
@@ -358,18 +362,18 @@ proc process_binary(binary: string, technique_list: seq): void =
       if bin_to_hex.contains(syscall) and syscall != "":
         count += weight
         colored_print(fmt"[-] Detected NTDLL API call syscalls: {nt_call}", fgYellow)
-        colored_print(fmt"[+] {nt_info} - {nt_call}", fgGreen)
+        print_info(infos, nt_call)
           
       elif bin.contains(nt_call) and nt_call != "":
         count += weight
         colored_print(fmt"[-] Detected NTDLL API call via strings: {nt_call}", fgYellow)
-        colored_print(fmt"[+] {nt_info} - {nt_call}", fgGreen)
+        print_info(infos, nt_call)
     
       # Kernel32 detection
       elif bin.contains(api_call):
         count += weight
         colored_print(fmt"[-] Detected Kernel32 API call via strings: {api_call}", fgYellow)
-        colored_print(fmt"[+] {k32_info} - {api_call}", fgGreen)
+        print_info(infos, api_call)
       
     res = int((count / total) * 100)
     if res >= 50:

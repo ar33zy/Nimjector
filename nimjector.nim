@@ -5,7 +5,7 @@ let doc = """
 Nimjector v 1.0
 
 Usage:
-  nimjector list -t <technique_name> [-c call]
+  nimjector list -t <technique_name> [-c <api_call>]
   nimjector red -i <shellcode> -t <technique_name> [-P] [-p <process_name>] [-e] [-n | -s | -g]
   nimjector blue -f binary
   nimjector (-h | --help)
@@ -17,9 +17,9 @@ Options:
   -i --image shellcode.bin	File to load
   -f --file binary		Binary to analyze
   -t --technique technique_name Name of technique (For list: use "all" to print all available techniques)
-  -c --call  			Print specific API call (For list: use "all" to print all available calls)
+  -c --call api_call   		Print specific API call (For list: use "all" to print all available calls)
   -P --print  			Print the template instead of writing into a file
-  -p --process 			Target process to be spawned or injected
+  -p --process process_name   	Target process to be spawned or injected
   -e --encrypt    		Encrypts the shellcode 
   -n --nt  			Use NTDLL calls instead of Kernel32
   -s --syscalls  		Use Syscalls via NimlineWhisphers2
@@ -39,20 +39,32 @@ if args["list"]:
 
   if contains(all_techniques, technique) or technique == "all":
     let calls = get_calls(technique_list, technique)
+    let infos = info_setup("models/info.yml")
+    var new_calls = newSeq[string]()
+    
+    for i in calls:
+      var split_call = i.split(" - ")[0]
+      new_calls.add(split_call)
+
     if technique == "all":
       colored_print(fmt"[+] Available techniques - {intToStr(all_techniques.len)}", fgGreen)
       for i in all_techniques:
         colored_print(fmt"[-] {i}", fgGreen)
     else:
-      if contains(calls, call) or call == "all" or call == "false":
+      if call == "all" or call == "false" or call == "nil":
         colored_print(fmt"[+] Technique: {technique}", fgGreen)
-        colored_print(fmt"[-] Calls:", fgGreen)
-        for i in calls:
-          var split_call = i.split(" - ")[0]
-          colored_print(fmt"[-] {split_call}", fgGreen)
-
+        colored_print(fmt"[*] Calls:", fgGreen)
+        for i in new_calls:
+          colored_print(fmt"[*] Listing API call description - {i}", fgGreen)
+          print_info(infos, i)
+      elif contains(new_calls, call):
+        colored_print(fmt"[*] Listing API call description - {call}", fgGreen)
+        print_info(infos, call)
       else:
         colored_print(fmt"[-] API Call not found - {call}", fgRed)
+        colored_print(fmt"[-] Valid API calls:", fgGreen)
+        for i in new_calls:
+          colored_print(fmt"[*] {i}", fgGreen)
 
   else:
     colored_print(fmt"[-] Technique not found - {technique}", fgRed)
@@ -91,10 +103,14 @@ if args["red"]:
   var payload = build_template(technique, technique_list, variation)
   payload = payload.replace("REPLACE_MODULES", modules)
   payload = payload.replace("REPLACE_INIT_SETUP", setup)
-  payload = payload.replace("REPLACE_SC_TEMPLATE", shellcode_template)
+
   payload = payload.replace("REPLACE_PROCESS", process)
+  payload = payload.replace("REPLACE_SC_TEMPLATE", shellcode_template)
   
   if args["--print"]:
+    colored_print(fmt"[+] Technique: {technique} - Nim Source code:", fgGreen)
+    writeFile(template_output, payload)
+    colored_print("[+] Payload written to payload.nim", fgGreen)
     echo payload
 
   else:

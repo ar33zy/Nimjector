@@ -30,3 +30,6 @@ https://github.com/ajpc500/NimlineWhispers2
 
 # Others
 https://github.com/S3cur3Th1sSh1t/Creds/tree/daadda8791fd9b45401cef4809953ab4d67b07e9
+
+# API Calls Description
+https://malapi.io/winapi/VirtualAlloc

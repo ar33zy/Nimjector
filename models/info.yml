@@ -1,159 +1,159 @@
 - name: CertEnumSystemStore
-  info: 
+  info: "The CertEnumSystemStore function retrieves the system stores available. This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: CertEnumSystemStoreLocation
-  info: 
+  info: "The CertEnumSystemStoreLocation function retrieves all of the system store locations. This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: CloseHandle
-  info: 
+  info: "CloseHandle is used to close an open object handle. Process and Thread Handles are the common object handles used in process injection."
 - name: ConvertThreadToFiber
-  info: 
+  info: "Converts the current thread into a fiber. Commonly used for techniques involving Fiber manipulation (create_fiber, fiber_context_edit)"
 - name: CreateEvent
-  info: 
+  info: "Creates or opens a named or unnamed event object. The created event is commonly used for invoking shellcode via CreateThreadpoolWait or CreateTimerQueueTimer, similarly serves like a thread."
 - name: CreateFiber
-  info: 
+  info: "Allocates a fiber object, assigns it a stack, and sets up execution to begin at the specified start address, typically the fiber function. Commonly used to execute a shellcode via fibers."
 - name: CreateFileW
-  info: 
+  info: "Creates or opens a file or I/O device."
 - name: CreateProcess
-  info: 
+  info: "Creates a new process and its primary thread. The new process runs in the security context of the calling process."
 - name: CreateRemoteThread
-  info: 
+  info: "CreateRemoteThread is used to create a thread that runs in the virtual address space of another process."
 - name: CreateThread
-  info: 
+  info: "CreateThread is used to create a thread to execute within the virtual address space of the calling process. This function is commonly used for shellcode execution."
 - name: CreateThreadpoolWait
-  info: 
+  info: "Creates a new wait object. This function is used to invoke a shellcode on its callback function, and will be invoked once the wait completes or times out."
 - name: CreateTimerQueue
-  info: 
+  info: "Creates a queue for timers. Timer-queue timers are lightweight objects that enable you to specify a callback function to be called at a specified time. The callback function can be used to invoke a shellcode"
 - name: CreateTimerQueueTimer
-  info: 
+  info: "Creates a timer-queue timer. This timer expires at the specified due time, then after every specified period. When the timer expires, the callback function or the shellcode is called."
 - name: CreateToolhelp32Snapshot
-  info: 
+  info: "Takes a snapshot of the specified processes, as well as the heaps, modules, and threads used by these processes."
 - name: CryptEnumOIDInfo
-  info: 
+  info: "The CryptEnumOIDInfo function enumerates predefined and registered object identifier (OID) CRYPT_OID_INFO structures. For each OID information structure enumerated, an application provided callback function (shellcode) is called."
 - name: DispatchMessageW
-  info: 
+  info: "Dispatches a message to a window procedure. It is typically used to dispatch a message retrieved by the GetMessage function. This invokes the callback function specified by SetTimer function."
 - name: EnumCalendarInfoW
-  info: 
+  info: "Enumerates calendar information for a specified locale. Invokes its callback function, wherein a shellcode address is used as a callback function."
 - name: EnumChildWindows
-  info: 
+  info: "Enumerates the child windows that belong to the specified parent window by passing the handle to each child window, in turn, to an application-defined callback function. This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumDateFormatsA
-  info: 
+  info: "Enumerates the long date, short date, or year/month formats that are available for a specified locale. This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumDesktopsW
-  info: 
+  info: "Enumerates all desktops associated with the specified window station of the calling process. The function passes the name of each desktop, in turn, to an application-defined callback function. This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumDesktopWindows
-  info: 
+  info: "Enumerates all top-level windows associated with the specified desktop. It passes the handle to each window, in turn, to an application-defined callback function. This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumDisplayMonitors
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumerateLoadedModules
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumFontFamiliesExW
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumFontsW
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumLanguageGroupLocalesW
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumObjects
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumPageFilesW
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumPwrSchemes
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumResourceTypesExW
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumResourceTypesW
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumSystemCodePagesA
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumSystemCodePagesW
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumSystemGeoID
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumSystemLanguageGroupsA
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumSystemLocalesA
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumSystemLocalesEx
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumThreadWindows
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumTimeFormatsA
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumTimeFormatsEx
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumUILanguagesA
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumUILanguagesW
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumWindows
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: EnumWindowStationsW
-  info: 
+  info: "This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: GetCurrentProcess
-  info: 
+  info: "GetCurrentProcess is used to retrieve a handle for the current process."
 - name: GetCurrentThreadId
-  info: 
+  info: "GetCurrentThreadId is used to retrieve the thread identifier of the calling thread."
 - name: GetDC
-  info: 
+  info: "GetDC is used to retrieve a handle to a device context (DC) for the client area of a specified window or for the entire screen. This function is commonly used by spyware for taking screenshots."
 - name: GetMessageW
-  info: 
+  info: "Retrieves a message from the calling thread's message queue. Commonly used in conjuction with DispatchMessageW."
 - name: GetProcessWindowStation
-  info: 
+  info: "Retrieves a handle to the current window station for the calling process."
 - name: GetThreadDesktop
-  info: 
+  info: "Retrieves a handle to the desktop assigned to the specified thread."
 - name: GetTopWindow
-  info: 
+  info: "Examines the Z order of the child windows associated with the specified parent window and retrieves a handle to the child window at the top of the Z order."
 - name: ImageGetDigestStream
-  info: 
+  info: "Retrieves the requested data from the specified image file. This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: ImmEnumInputContext
-  info: 
+  info: "Retrieves the input context for the specified thread. This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: InitOnceExecuteOnce
-  info: 
+  info: "Executes the specified function successfully one time. This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: LoadLibraryW
-  info: 
+  info: "LoadLibraryW is used to load a specified module into the address space of the calling process. Malware commonly use this to load DLLs dynamically for evasion purposes."
 - name: OpenProcess
-  info: 
+  info: "OpenProcess is used to get a handle on a process. This function is commonly used by malware during process injection."
 - name: OpenThread
-  info: 
+  info: "OpenThread is used to get a handle on a specified thread. It is commonly seen in process injection techniques."
 - name: Process32First
-  info: 
+  info: "Process32First is used as part of CreateToolhelp32Snapshot for enumeration purposes."
 - name: Process32Next
-  info: 
+  info: "Process32Next is used as part of CreateToolhelp32Snapshot for enumeration purposes."
 - name: QueueUserAPC
-  info: 
-- name: ReadProcessMemory
-  info: 
+  info: "QueueUserAPC is used to execute code for a different thread. This function is commonly used as part of process injection."
+- name: ReadProcessMemoy
+  info: "ReadProcessMemory can be used to read the memory of a remote process."
 - name: ResumeThread
-  info: 
+  info: "ResumeThread is used to resume a specified thread often times as part of process injection."
 - name: RtlCopyMemory
-  info: 
+  info: "RtlCopyMemory is used to copy the contents of a source memory block to a destination memory block."
 - name: RtlMoveMemory
-  info: 
+  info: "RtlMoveMemory is used to copy the contents of a source memory block to a destination memory block, and supports overlapping source and destination memory blocks."
 - name: SetThreadpoolWait
-  info: 
+  info: "Sets the wait object, replacing the previous wait object, if any. A worker thread calls the wait object's callback function after the handle becomes signaled or after the specified timeout expires."
 - name: SetTimer
-  info: 
+  info: "Creates a timer with the specified time-out value. This function is used to invoke a shellcode via callback functions."
 - name: SetupCommitFileQueueW
-  info: 
+  info: "The SetupCommitFileQueue function performs file operations queued on a setup file queue. This function is used for shellcode injection by providing a shellcode address as its callback function."
 - name: SetupOpenFileQueue
-  info: 
+  info: "The SetupOpenFileQueue function creates a setup file queue."
 - name: SetupQueueCopyW
-  info: 
+  info: "The SetupQueueCopy function adds a single file copy operation to a setup file queue."
 - name: SwitchToFiber
-  info: 
+  info: "Schedules a fiber. The function must be called on a fiber. Mainly used to invoke the shellcode pointed in a fiber."
 - name: Thread32First
-  info: 
+  info: "Thread32First is used as part of CreateToolhelp32Snapshot for enumeration purposes."
 - name: Thread32Next
-  info: 
+  info: "Thread32Next is used as part of CreateToolhelp32Snapshot for enumeration purposes."
 - name: VirtualAlloc
-  info: 
+  info: "VirtualAlloc is often used by malware to allocate memory as part of process injection. This function returns the memory address of the newly allocated space."
 - name: VirtualAllocEx
-  info: 
+  info: "VirtualAllocEx is often used by malware to allocate memory in a remote process as part of process injection. This function returns the memory address of the newly allocated space."
 - name: VirtualProtect
-  info: 
+  info: "VirtualProtect is often used by malware to modify memory protection (often to allow write or execution)."
 - name: VirtualProtectEx
-  info: 
+  info: "VirtualProtectEx is often used by malware to modify memory protection in a remote process (often to allow write or execution)."
 - name: WaitForSingleObject
-  info: 
+  info: "WaitForSingleObject is used to delay the execution of an object. This function is commonly used to allow time for shellcode being executed within a thread to run. It is also used for time-based evasion."
 - name: WriteProcessMemory
-  info: 
+  info: "Writing data into a specified region of memory. This function is often used by malware as part of process injection to inject malicious code into a specified process."
 - name: ZwQueryInformationProcess
-  info: 
+  info: "Retrieves information about the specified process. Commonly used to retrieve PEB structure for process hollowing."
 
