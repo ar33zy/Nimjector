@@ -1,6 +1,7 @@
 REPLACE_MODULES
 
 REPLACE_INIT_SETUP
+REPLACE_BYPASS_INIT
 
 proc REPLACE_TECHNIQUE_NAME[byte](shellcode: openArray[byte]): void =
 REPLACE_API_CALLS
@@ -8,6 +9,7 @@ REPLACE_API_CALLS
 when isMainModule:
   func toByteSeq*(str: string): seq[byte] {.inline.} =
     @(str.toOpenArrayByte(0, str.high))
-  
+ 
+  REPLACE_BYPASS
   REPLACE_SC_TEMPLATE
   REPLACE_TECHNIQUE_NAME(shellcode)

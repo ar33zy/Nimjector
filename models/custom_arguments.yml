@@ -34,6 +34,8 @@
   calls:
   - api_call: VirtualAllocEx
     fn_template: early_bird_apc_queue_virtual_alloc_ex
+  - api_call: NtAllocateVirtualMemory
+    fn_template: nt_virtual_alloc_ex
 - name: apc_queue
   calls:
   - api_call: CreateToolhelp32Snapshot

@@ -156,4 +156,15 @@
   info: "Writing data into a specified region of memory. This function is often used by malware as part of process injection to inject malicious code into a specified process."
 - name: ZwQueryInformationProcess
   info: "Retrieves information about the specified process. Commonly used to retrieve PEB structure for process hollowing."
-
+- name: NtAllocateVirtualMemory
+  info: "NtAllocateVirtualMemoy is used to reserve, commit, or both, a region of pages within the user-mode virtual address space of a specified process."
+- name: NtWriteVirtualMemory
+  info: "NtWriteVirtualMemory is used to copy the specified address range from the current process into the specified address range of the specified process."
+- name: NtCreateThreadEx
+  info: "NtCreateThreadEx is used to create a new thread."
+- name: NtWaitForSingleObject
+  info: "NtWaitForSingleObject is used to wait until the specified object is in the signaled state or the time-out interval elapses. This function is commonly used by malware for evasion purposes."
+- name: NtOpenProcess
+  info: "NtOpenProcess is used to get a handle on a process. This function is commonly used as part of process injection."
+- name: NtClose
+  info: "NtClose is used to close an open handle."

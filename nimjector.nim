@@ -6,7 +6,7 @@ Nimjector v 1.0
 
 Usage:
   nimjector list -t <technique_name> [-c <api_call>]
-  nimjector red -i <shellcode> -t <technique_name> [-P] [-p <process_name>] [-e] [-n | -s | -g]
+  nimjector red -i <shellcode> -t <technique_name> [-P] [-p <process_name>] [-e] [-E <evasion>] [-n | -s | -g]
   nimjector blue -f binary
   nimjector (-h | --help)
   nimjector --version
@@ -20,6 +20,7 @@ Options:
   -c --call api_call   		Print specific API call (For list: use "all" to print all available calls)
   -P --print  			Print the template instead of writing into a file
   -p --process process_name   	Target process to be spawned or injected
+  -E --evasion bypass_technique Applies evasion technique (Comma-delimited: etw_patch, amsi_patch or all)
   -e --encrypt    		Encrypts the shellcode 
   -n --nt  			Use NTDLL calls instead of Kernel32
   -s --syscalls  		Use Syscalls via NimlineWhisphers2
@@ -65,7 +66,6 @@ if args["list"]:
         colored_print(fmt"[-] Valid API calls:", fgGreen)
         for i in new_calls:
           colored_print(fmt"[*] {i}", fgGreen)
-
   else:
     colored_print(fmt"[-] Technique not found - {technique}", fgRed)
   
@@ -87,6 +87,9 @@ if args["red"]:
   # Load shellcode 
   let shellcode = readFile(shellcode_file)
 
+  # loading bypass techniques
+  var bypass_technique = $args["--evasion"]
+
   # API call variations
   var variation = "kernel32"   
   if args["--nt"]:
@@ -95,10 +98,13 @@ if args["red"]:
     variation = "syscalls"
   if args["--gstub"]:
     variation = "gstub"
+  colored_print(fmt"[+] Variation used: {variation}", fgGreen)
 
   var modules = get_modules(technique, variation, shellcode_type)
   var setup = get_init_setup(technique, technique_list, variation)
   var shellcode_template = get_shellcode_template(shellcode_type, encode(shellcode))
+  #var bypass_init = get_bypass_init(bypass_technique)
+  #var bypass_template = get_bypass_template(bypass_technique)
 
   var payload = build_template(technique, technique_list, variation)
   payload = payload.replace("REPLACE_MODULES", modules)
@@ -106,6 +112,8 @@ if args["red"]:
 
   payload = payload.replace("REPLACE_PROCESS", process)
   payload = payload.replace("REPLACE_SC_TEMPLATE", shellcode_template)
+  #payload = payload.replace("REPLACE_BYPASS_INIT", bypass_init)
+  #payload = payload.replace("REPLACE_BYPASS", bypass_template)
   
   if args["--print"]:
     colored_print(fmt"[+] Technique: {technique} - Nim Source code:", fgGreen)

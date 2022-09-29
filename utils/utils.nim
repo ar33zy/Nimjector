@@ -163,9 +163,7 @@ proc get_modules(technique: string, variation: string, shellcode_type: string): 
 proc k32_to_nt(call: string, ntdll_calls: seq[NtdllCalls]): string = 
   for i in ntdll_calls:
     if i.name == call:
-      coloredPrint(fmt"[-] Converted {call} into {i.ntdll}", fgGreen)
       return i.ntdll
-  coloredPrint(fmt"[-] No NT API call for {call}", fgYellow)
   return call
 
 proc nt_to_syscall(call: string, syscalls: seq[Syscalls]): string = 
@@ -300,9 +298,15 @@ proc build_template(technique: string, technique_list: seq, variation: string): 
     
   # Setup API calls
   for call in calls:
-    var api_call = call.split(" - ")[0]
+    var temp = call.split(" - ")[0]
+    var api_call = temp
     if contains(ntdll_variations, variation): 
       api_call = k32_to_nt(api_call, ntdll_calls)
+    
+      if api_call != temp:
+        colored_print(fmt"[-] Converted {temp} into {api_call}", fgGreen)
+      else:
+        colored_print(fmt"[-] No NT API call for {temp}", fgYellow)
 
     content = ""
     for custom_arg in arguments:

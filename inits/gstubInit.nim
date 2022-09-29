@@ -6,8 +6,8 @@ let tProcess = startProcess("notepad.exe")
 tProcess.suspend() 
 defer: tProcess.close()
 
-var cid: CLIENT_ID
-cid.UniqueProcess = tProcess.processID
+var cid2: CLIENT_ID
+cid2.UniqueProcess = tProcess.processID
     
 let tProcess2 = GetCurrentProcessId()
 var pHandle2: HANDLE = OpenProcess(PROCESS_ALL_ACCESS, FALSE, tProcess2)
