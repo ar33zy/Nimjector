@@ -9,7 +9,11 @@ Install the following packages first before compiling the tool:
 ```
 $ git clone https://github.com/ar33zy/Nimjector.git
 $ cd 
-$ nimble install yaml
+# Ensure mingw gcc is installed
+$ sudo apt install mingw-w64
+# Install nim modules
+$ nimble install yaml docopt winim nimcrypto
+# Compile the nimjector binary
 $ nim c --skipProjCfg -d=release --cc:gcc --embedsrc=on --hints=on --app=console --cpu=amd64 --out=nimjector nimjector.nim
 ```
 
@@ -89,4 +93,4 @@ https://github.com/ajpc500/NimlineWhispers2
 https://github.com/S3cur3Th1sSh1t/Creds/tree/daadda8791fd9b45401cef4809953ab4d67b07e9
 
 ### API Calls Description
-https://malapi.io/winapi/VirtualAlloc
+https://malapi.io/
